@@ -1,0 +1,240 @@
+<% layout("/layout/boilerplate") %>
+<body>
+    <h2 class="mb-4">Hi <%= user.name || user.username %>, welcome👋</h2>
+
+    
+    <div class="dashboard-summary">
+
+    <div class="summary-card balance">
+        <p>Balance</p>
+        <h2>₹ <%= currentBalance %></h2>
+    </div>
+
+    <a href="/transaction/income/analytics" class="summary-card income">
+        <p>Total Income</p>
+        <h2>₹ <%= totalIncome %></h2>
+    </a>
+
+    <a href="/transaction/expense/analytics" class="summary-card expense">
+        <p>Total Expense</p>
+        <h2>₹ <%= totalExpense %></h2>
+    </a>
+
+
+
+</div>
+
+
+<div class="trend-card">
+
+    <h3>Income vs Expense Trend</h3>
+
+    <canvas id="dashboardTrend"></canvas>
+
+</div>
+
+   <div class="quick-actions">
+
+    <a href="/transaction/income/analytics"
+       class="quick-card income-action">
+
+     Income Analytics
+
+    </a>
+
+    <a href="/transaction/expense/analytics"
+       class="quick-card expense-action">
+
+     Expense Analytics
+
+    </a>
+
+    <a href="/transactions"
+       class="quick-card transaction-action">
+
+         View All Transactions
+
+    </a>
+
+</div>
+
+<h3 class="recent-heading">
+    Recent Transactions
+</h3>
+
+
+    <% for(let e of recentTransactions){ %>
+        <div class="expenses">
+
+    <div class="expense-header">
+        <div>
+            <h4><%= e.title %></h4>
+            <p class="category">
+                <%= e.category %> • <%= e.type %>
+            </p>
+        </div>
+
+        <div class="amount <%= e.type %>">
+            ₹<%= e.amount %>
+        </div>
+    </div>
+
+    <div class="expense-footer">
+        <span>
+            <%= e.date.toString().split(" ").slice(0,4).join(" ") %>
+        </span>
+
+        <div class="action-buttons">
+
+            <form method="get" action="/transaction/<%= e._id %>/edit">
+                <button class="btn btn-primary">Edit</button>
+            </form>
+
+            <form method="post" action="/transaction/<%= e._id %>?_method=DELETE">
+                <button class="btn btn-danger">Delete</button>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+        
+    <% } %>
+    
+   
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+const chartLabels =
+<%- JSON.stringify(chartLabels) %>;
+
+const incomeValues =
+<%- JSON.stringify(incomeValues) %>;
+
+const expenseValues =
+<%- JSON.stringify(expenseValues) %>;
+
+const ctx =
+document.getElementById("dashboardTrend")
+.getContext("2d");
+
+const incomeGradient =
+ctx.createLinearGradient(
+0,
+0,
+0,
+400
+);
+
+incomeGradient.addColorStop(
+0,
+"#22c55e"
+);
+
+incomeGradient.addColorStop(
+0.5,
+"#16a34a"
+);
+
+incomeGradient.addColorStop(
+1,
+"#15803d"
+);
+
+const expenseGradient =
+ctx.createLinearGradient(
+0,
+0,
+0,
+400
+);
+
+expenseGradient.addColorStop(
+0,
+"#ef4444"
+);
+
+expenseGradient.addColorStop(
+0.5,
+"#dc2626"
+);
+
+expenseGradient.addColorStop(
+1,
+"#991b1b"
+);
+new Chart(ctx,{
+
+    type:"bar",
+
+    data:{
+
+        labels:chartLabels,
+
+        datasets:[
+
+        {
+
+            label:"Income",
+
+            data:incomeValues,
+
+            backgroundColor:
+            incomeGradient,
+
+            borderRadius:18,
+
+            borderSkipped:false,
+
+            barThickness:22
+
+        },
+
+        {
+
+            label:"Expense",
+
+            data:expenseValues,
+
+            backgroundColor:
+            expenseGradient,
+
+            borderRadius:18,
+
+            borderSkipped:false,
+
+            barThickness:22
+
+        }
+
+        ]
+    },
+
+    options:{
+
+        responsive:true,
+
+        plugins:{
+
+            legend:{
+                position:"top"
+            }
+        },
+
+        scales:{
+
+            x:{
+                grid:{
+                    display:false
+                }
+            },
+
+            y:{
+                beginAtZero:true
+            }
+        }
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<% layout("/layout/boilerplate") %>
+
+<body>
+
+    <div class="profile-wrapper">
+
+    <div class="profile-card">
+
+        <h2>Profile</h2>
+
+        <div class="profile-avatar">
+
+            <%= user.name.charAt(0).toUpperCase() %>
+
+        </div>
+
+        <form
+        action="/userdetail/change"
+        method="POST">
+
+            <label>Name</label>
+
+            <input
+            type="text"
+            name="name"
+            value="<%= user.name %>">
+
+            <label>Username</label>
+
+            <input
+            type="text"
+            value="<%= user.username %>"
+            disabled>
+
+            <label>Age</label>
+
+            <input
+            type="number"
+            name="age"
+            value="<%= user.age %>">
+
+            <button
+            class="save-btn">
+
+                Save Changes
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>

@@ -1,0 +1,207 @@
+<% layout("/layout/boilerplate") %>
+
+<div class="analytics-header">
+
+    <h2>Income Analytics</h2>
+
+    <select
+        id="chartSelector"
+        class="chart-select"
+    >
+
+        <option value="bar" selected>
+            📊 Bar Graph
+        </option>
+
+        <option value="pie">
+            🥧 Pie Chart
+        </option>
+
+    </select>
+
+</div>
+
+<div class="analytics-filter">
+
+    <a href="/transaction/income/analytics?filter=week"
+       class="filter-btn <%= filter==='week' ? 'active-filter' : '' %>">
+       Week
+    </a>
+
+    <a href="/transaction/income/analytics?filter=month"
+       class="filter-btn <%= filter==='month' ? 'active-filter' : '' %>">
+       Month
+    </a>
+
+    <a href="/transaction/income/analytics?filter=year"
+       class="filter-btn <%= filter==='year' ? 'active-filter' : '' %>">
+       Year
+    </a>
+
+</div>
+
+<div class="chart-card">
+
+    <h4>Income Trend</h4>
+
+    <canvas id="incomeChart"></canvas>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+const incomeData =
+<%- JSON.stringify(incomeData) %>;
+
+const filter =
+"<%= filter %>";
+
+let labels = [];
+let values = [];
+
+if(filter === "year"){
+
+    labels = [
+        "Jan","Feb","Mar","Apr",
+        "May","Jun","Jul","Aug",
+        "Sep","Oct","Nov","Dec"
+    ];
+
+    values = new Array(12).fill(0);
+
+    incomeData.forEach(e=>{
+
+        const month =
+        new Date(e.date).getMonth();
+
+        values[month] += e.amount;
+    });
+}
+
+else if(filter === "week"){
+
+    labels = [
+        "Sun","Mon","Tue",
+        "Wed","Thu","Fri","Sat"
+    ];
+
+    values = new Array(7).fill(0);
+
+    incomeData.forEach(e=>{
+
+        const day =
+        new Date(e.date).getDay();
+
+        values[day] += e.amount;
+    });
+}
+
+else{
+
+    labels = [
+        "Week 1",
+        "Week 2",
+        "Week 3",
+        "Week 4",
+        "Week 5"
+    ];
+
+    values = [0,0,0,0,0];
+
+    incomeData.forEach(e=>{
+
+        const week =
+        Math.floor(
+            (new Date(e.date).getDate()-1)/7
+        );
+
+        values[week] += e.amount;
+    });
+}
+
+const ctx =
+document.getElementById("incomeChart")
+.getContext("2d");
+
+const gradient =
+ctx.createLinearGradient(
+    0,0,0,400
+);
+
+gradient.addColorStop(
+    0,
+    "#22c55e"
+);
+
+gradient.addColorStop(
+    1,
+    "#3b82f6"
+);
+
+new Chart(
+document.getElementById("incomeChart"),
+{
+    type:"bar",
+
+    data:{
+        labels:labels,
+
+        datasets:[{
+            label:"Income",
+
+            data:values,
+
+            backgroundColor:
+            gradient,
+
+            borderRadius:18,
+
+            borderSkipped:false,
+
+            barThickness:28,
+
+            hoverBackgroundColor:
+            "#16a34a"
+        }]
+    },
+
+    options:{
+        responsive:true,
+
+        plugins:{
+            legend:{
+                display:false
+            }
+        },
+
+        scales:{
+            x:{
+                grid:{
+                    display:false
+                }
+            },
+
+            y:{
+                beginAtZero:true,
+
+                grid:{
+                    color:"#e5e7eb"
+                }
+            }
+        }
+    }
+});
+
+document
+.getElementById("chartSelector")
+.addEventListener("change",function(){
+
+    if(this.value==="pie"){
+
+        window.location.href=
+        "/transaction/income/piechart";
+    }
+
+});
+</script>
