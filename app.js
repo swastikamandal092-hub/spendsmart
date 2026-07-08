@@ -333,51 +333,409 @@ app.post(
 }));
 
 app.get(
-    "/transaction/income/analytics",
-    userLoggedin,
-    wrapAsync(async(req,res)=>{
+"/transaction/income/analytics",
+userLoggedin,
+wrapAsync(async(req,res)=>{
 
-        const filter =
-            req.query.filter || "month";
+    const selectedYear =
+    Number(req.query.year) ||
+    new Date().getFullYear();
 
-        const incomeData =
-            await Expense.find({
-                user:req.user._id,
-                type:"income"
-            });
+    const selectedMonth =
+    Number(req.query.month) ||
+    (new Date().getMonth()+1);
 
-        res.render(
-            "income/analytics.ejs",
-            {
-                incomeData,
-                filter
+    const selectedWeek =
+    Number(req.query.week) || 1;
+
+    const filter =
+    req.query.filter || "month";
+
+    let incomeData = [];
+
+    // ----------------------------
+    // DATABASE QUERY
+    // ----------------------------
+
+    if(filter==="year"){
+
+        const start =
+        new Date(selectedYear,0,1);
+
+        const end =
+        new Date(selectedYear,11,31,23,59,59);
+
+        incomeData =
+        await Expense.find({
+
+            user:req.user._id,
+
+            type:"income",
+
+            date:{
+                $gte:start,
+                $lte:end
             }
+
+        }).sort({date:1});
+
+    }
+
+    else{
+
+        const start =
+        new Date(selectedYear,selectedMonth-1,1);
+
+        const end =
+        new Date(selectedYear,selectedMonth,0,23,59,59);
+
+        incomeData =
+        await Expense.find({
+
+            user:req.user._id,
+
+            type:"income",
+
+            date:{
+                $gte:start,
+                $lte:end
+            }
+
+        }).sort({date:1});
+
+    }
+
+
+    // ----------------------------
+    // GRAPH
+    // ----------------------------
+
+    let labels = [];
+    let values = [];
+
+    // YEAR GRAPH
+
+    if(filter==="year"){
+
+        labels=[
+            "Jan","Feb","Mar","Apr",
+            "May","Jun","Jul","Aug",
+            "Sep","Oct","Nov","Dec"
+        ];
+
+        values=new Array(12).fill(0);
+
+        incomeData.forEach(item=>{
+
+            const m =
+            new Date(item.date).getMonth();
+
+            values[m]+=item.amount;
+
+        });
+
+    }
+
+    // WEEK GRAPH
+
+   else if(filter==="week"){
+
+    labels = [];
+    values = new Array(7).fill(0);
+
+    const firstDate = (selectedWeek - 1) * 7 + 1;
+
+    for(let i=0; i<7; i++){
+
+        const currentDate = new Date(
+            selectedYear,
+            selectedMonth-1,
+            firstDate + i
         );
+
+        labels.push([
+            currentDate.toLocaleDateString(
+                "en-US",
+                { weekday:"short" }
+            ),
+            currentDate.getDate()
+        ]);
+
+    }
+
+    incomeData.forEach(item=>{
+
+        const d = new Date(item.date);
+
+        const week =
+        Math.floor((d.getDate()-1)/7)+1;
+
+        if(week === selectedWeek){
+
+            const index =
+            d.getDate() - firstDate;
+
+            if(index>=0 && index<7){
+
+                values[index] += item.amount;
+
+            }
+
+        }
+
+    });
+
+}
+
+    // MONTH GRAPH
+
+    else{
+
+        labels=[
+            "Week 1",
+            "Week 2",
+            "Week 3",
+            "Week 4",
+            "Week 5"
+        ];
+
+        values=[0,0,0,0,0];
+
+        incomeData.forEach(item=>{
+
+            const week =
+            Math.floor((new Date(item.date).getDate()-1)/7);
+
+            if(week>=0 && week<5){
+
+                values[week]+=item.amount;
+
+            }
+
+        });
+
+    }
+
+    res.render(
+        "income/analytics",
+        {
+            incomeData,
+            labels,
+            values,
+            selectedYear,
+            selectedMonth,
+            selectedWeek,
+            filter,
+            currentChart:"bar"
+        }
+    );
 
 }));
 
-
 app.get(
-    "/transaction/expense/analytics",
-    userLoggedin,
-    wrapAsync(async(req,res)=>{
+"/transaction/expense/analytics",
+userLoggedin,
+wrapAsync(async(req,res)=>{
 
-        const filter =
-            req.query.filter || "month";
+    const selectedYear =
+    Number(req.query.year) ||
+    new Date().getFullYear();
 
-        const expenseData =
-            await Expense.find({
-                user:req.user._id,
-                type:"expense"
-            }).sort({ date:1 });
+    const selectedMonth =
+    Number(req.query.month) ||
+    (new Date().getMonth()+1);
 
-        res.render(
-            "expense/analytics.ejs",
-            {
-                expenseData,
-                filter
+    const selectedWeek =
+    Number(req.query.week) || 1;
+
+    const filter =
+    req.query.filter || "month";
+
+    let expenseData = [];
+
+    // ---------------- DATABASE ----------------
+
+    if(filter==="year"){
+
+        const start =
+        new Date(selectedYear,0,1);
+
+        const end =
+        new Date(selectedYear,11,31,23,59,59);
+
+        expenseData =
+        await Expense.find({
+
+            user:req.user._id,
+
+            type:"expense",
+
+            date:{
+                $gte:start,
+                $lte:end
             }
-        );
+
+        }).sort({date:1});
+
+    }
+
+    else{
+
+        const start =
+        new Date(selectedYear,selectedMonth-1,1);
+
+        const end =
+        new Date(selectedYear,selectedMonth,0,23,59,59);
+
+        expenseData =
+        await Expense.find({
+
+            user:req.user._id,
+
+            type:"expense",
+
+            date:{
+                $gte:start,
+                $lte:end
+            }
+
+        }).sort({date:1});
+
+    }
+
+    // ---------------- GRAPH ----------------
+
+    let labels = [];
+    let values = [];
+
+    if(filter==="year"){
+
+        labels=[
+            "Jan","Feb","Mar","Apr",
+            "May","Jun","Jul","Aug",
+            "Sep","Oct","Nov","Dec"
+        ];
+
+        values=new Array(12).fill(0);
+
+        expenseData.forEach(item=>{
+
+            const month =
+            new Date(item.date).getMonth();
+
+            values[month]+=item.amount;
+
+        });
+
+    }
+
+    else if(filter==="week"){
+
+        labels=[];
+        values=new Array(7).fill(0);
+
+        const firstDate =
+        (selectedWeek-1)*7+1;
+
+        for(let i=0;i<7;i++){
+
+            const currentDate =
+            new Date(
+                selectedYear,
+                selectedMonth-1,
+                firstDate+i
+            );
+
+            labels.push([
+
+                currentDate.toLocaleDateString(
+                    "en-US",
+                    {weekday:"short"}
+                ),
+
+                currentDate.getDate()
+
+            ]);
+
+        }
+
+        expenseData.forEach(item=>{
+
+            const d =
+            new Date(item.date);
+
+            const week =
+            Math.floor((d.getDate()-1)/7)+1;
+
+            if(week===selectedWeek){
+
+                const index =
+                d.getDate()-firstDate;
+
+                if(index>=0 && index<7){
+
+                    values[index]+=item.amount;
+
+                }
+
+            }
+
+        });
+
+    }
+
+    else{
+
+        labels=[
+            "Week 1",
+            "Week 2",
+            "Week 3",
+            "Week 4",
+            "Week 5"
+        ];
+
+        values=[0,0,0,0,0];
+
+        expenseData.forEach(item=>{
+
+            const week =
+            Math.floor(
+                (new Date(item.date).getDate()-1)/7
+            );
+
+            if(week>=0 && week<5){
+
+                values[week]+=item.amount;
+
+            }
+
+        });
+
+    }
+
+    console.log("Expense Data:", expenseData);
+    console.log("Values:", values);
+
+    res.render(
+    "expense/analytics",{
+
+        expenseData,
+
+        labels,
+
+        values,
+
+        selectedYear,
+
+        selectedMonth,
+
+        selectedWeek,
+
+        filter,
+
+        currentChart:"bar"
+
+    });
 
 }));
 
@@ -400,9 +758,11 @@ app.get(
     });
 
     res.render(
-        "income/piechart",
-        { incomeData }
-    );
+"income/piechart",
+{
+    incomeData,
+    currentChart:"pie"
+});
 
 }));
 //expense line graph

@@ -1,211 +1,415 @@
 <% layout("/layout/boilerplate") %>
 
-<div class="analytics-header">
+<%
+const months=[
+"January",
+"February",
+"March",
+"April",
+"May",
+"June",
+"July",
+"August",
+"September",
+"October",
+"November",
+"December"
+];
+%>
 
-    <h2>Expense Analytics</h2>
+<div class="container py-4">
 
-    <select
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2 class="fw-bold text-danger mb-0">
+
+            Expense Analytics
+
+        </h2>
+
+        <select
         id="chartSelector"
-        class="chart-select"
-    >
+        class="form-select shadow-sm"
+        style="width:150px;">
 
-        <option value="bar" selected>
-            📊 Bar Graph
-        </option>
+            <option
+            value="bar"
+            <%= currentChart==="bar" ? "selected":"" %>>
 
-        <option value="pie">
-            🥧 Pie Chart
-        </option>
+                📊 Bar Graph
 
-    </select>
+            </option>
+
+            <option
+            value="pie"
+            <%= currentChart==="pie" ? "selected":"" %>>
+
+                🥧 Pie Chart
+
+            </option>
+
+        </select>
+
+    </div>
+
+    <!-- Filters -->
+
+    <div class="row g-2 mb-4">
+
+        <!-- Week -->
+
+        <div class="col-md-4">
+
+            <div class="dropdown">
+
+                <button
+                class="btn btn-outline-danger dropdown-toggle"
+                id="weekBtn"
+                data-bs-toggle="dropdown">
+
+                    Week <%= selectedWeek %>
+
+                </button>
+
+                <ul class="dropdown-menu custom-dropdown">
+
+                    <% for(let i=1;i<=5;i++){ %>
+
+                    <li>
+
+                        <a
+                        href="#"
+                        class="dropdown-item week-item"
+                        data-week="<%= i %>">
+
+                            Week <%= i %>
+
+                        </a>
+
+                    </li>
+
+                    <% } %>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+        <!-- Month -->
+
+        <div class="col-md-4">
+
+            <div class="dropdown">
+
+                <button
+                class="btn btn-outline-primary dropdown-toggle"
+                id="monthBtn"
+                data-bs-toggle="dropdown">
+
+                    <%= months[selectedMonth-1] %>
+
+                </button>
+
+                <ul class="dropdown-menu custom-dropdown">
+
+                    <% months.forEach((month,index)=>{ %>
+
+                    <li>
+
+                        <a
+                        href="#"
+                        class="dropdown-item month-item"
+                        data-month="<%= index+1 %>">
+
+                            <%= month %>
+
+                        </a>
+
+                    </li>
+
+                    <% }) %>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+        <!-- Year -->
+
+        <div class="col-md-4">
+
+            <div class="dropdown">
+
+                <button
+                class="btn btn-outline-dark dropdown-toggle"
+                id="yearBtn"
+                data-bs-toggle="dropdown">
+
+                    <%= selectedYear %>
+
+                </button>
+
+                <ul class="dropdown-menu custom-dropdown">
+
+                    <%
+                    const currentYear=
+                    new Date().getFullYear();
+                    %>
+
+                    <% for(let y=currentYear;y>=2000;y--){ %>
+
+                    <li>
+
+                        <a
+                        href="#"
+                        class="dropdown-item year-item"
+                        data-year="<%= y %>">
+
+                            <%= y %>
+
+                        </a>
+
+                    </li>
+
+                    <% } %>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Graph -->
+
+<div class="card shadow border-0 rounded-4">
+
+    <div class="card-body p-4">
+
+        <canvas
+            id="expenseChart"
+            height="110">
+        </canvas>
+
+        <div class="text-center mt-4">
+
+            <small
+                id="showingPeriod"
+                class="text-secondary fw-semibold">
+
+                Showing data for :
+                Week <%= selectedWeek %> •
+                <%= months[selectedMonth-1] %>
+                <%= selectedYear %>
+
+            </small>
+
+        </div>
+
+    </div>
 
 </div>
 
-<div class="analytics-filter">
-
-    <a href="/transaction/expense/analytics?filter=week"
-       class="filter-btn <%= filter==='week' ? 'active-filter' : '' %>">
-       Week
-    </a>
-
-    <a href="/transaction/expense/analytics?filter=month"
-       class="filter-btn <%= filter==='month' ? 'active-filter' : '' %>">
-       Month
-    </a>
-
-    <a href="/transaction/expense/analytics?filter=year"
-       class="filter-btn <%= filter==='year' ? 'active-filter' : '' %>">
-       Year
-    </a>
-
 </div>
-
-<div class="chart-card">
-
-    <h4>Expense Trend</h4>
-
-    <canvas id="expenseChart"></canvas>
-
-</div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 
-const expenseData =
-<%- JSON.stringify(expenseData) %>;
+const showingPeriod =
+document.getElementById("showingPeriod");
 
-const filter =
-"<%= filter %>";
-let labels = [];
-let values = [];
+const selectedWeek =
+<%= selectedWeek %>;
 
-if(filter === "year"){
+const selectedMonth =
+<%= selectedMonth %>;
 
-    labels = [
-        "Jan","Feb","Mar","Apr",
-        "May","Jun","Jul","Aug",
-        "Sep","Oct","Nov","Dec"
-    ];
+const selectedYear =
+<%= selectedYear %>;
 
-    values = new Array(12).fill(0);
+const monthBtn =
+document.getElementById("monthBtn");
 
-    expenseData.forEach(e=>{
+const weekBtn =
+document.getElementById("weekBtn");
 
-        const month =
-        new Date(e.date).getMonth();
+const yearBtn =
+document.getElementById("yearBtn");
 
-        values[month] += e.amount;
-    });
+function updateShowing(){
 
-}
-
-else if(filter === "week"){
-
-    labels = [
-        "Sun","Mon","Tue",
-        "Wed","Thu","Fri","Sat"
-    ];
-
-    values = new Array(7).fill(0);
-
-    expenseData.forEach(e=>{
-
-        const day =
-        new Date(e.date).getDay();
-
-        values[day] += e.amount;
-    });
+    showingPeriod.innerHTML =
+    `Showing data for : Week ${selectedWeek} • ${months[selectedMonth-1]} ${selectedYear}`;
 
 }
 
-else{
+document.querySelectorAll(".month-item").forEach(item=>{
 
-    labels = [
-        "Week 1",
-        "Week 2",
-        "Week 3",
-        "Week 4",
-        "Week 5"
-    ];
+    item.addEventListener("click",function(e){
 
-    values = [0,0,0,0,0];
+        e.preventDefault();
 
-    expenseData.forEach(e=>{
+        const monthNumber=this.dataset.month;
 
-        const week =
-        Math.floor(
-            (new Date(e.date).getDate()-1)/7
-        );
+        window.location.href=
+        `/transaction/expense/analytics?filter=month&year=${selectedYear}&month=${monthNumber}`;
 
-        values[week] += e.amount;
     });
 
-}
+});
+
+document.querySelectorAll(".week-item").forEach(item=>{
+
+    item.addEventListener("click",function(e){
+
+        e.preventDefault();
+
+        const week=this.dataset.week;
+
+        window.location.href=
+        `/transaction/expense/analytics?filter=week&year=${selectedYear}&month=${selectedMonth}&week=${week}`;
+
+    });
+
+});
+
+document.querySelectorAll(".year-item").forEach(item=>{
+
+    item.addEventListener("click",function(e){
+
+        e.preventDefault();
+
+        const year=this.dataset.year;
+
+        window.location.href=
+        `/transaction/expense/analytics?filter=year&year=${year}&month=${selectedMonth}`;
+
+    });
+
+});
+
+const labels =
+<%- JSON.stringify(labels) %>;
+
+const values =
+<%- JSON.stringify(values) %>;
+
 const ctx =
 document.getElementById("expenseChart")
 .getContext("2d");
 
 const gradient =
-ctx.createLinearGradient(
-    0,0,0,400
-);
+ctx.createLinearGradient(0,0,0,400);
 
-gradient.addColorStop(
-    0,
-    "#3b82f6"
-);
+// Expense Gradient
+gradient.addColorStop(0,"#FFD6A5");
+gradient.addColorStop(0.5,"#FFB4A2");
+gradient.addColorStop(1,"#CDB4DB");
 
-gradient.addColorStop(
-    1,
-    "#ec4899"
-);
+new Chart(ctx,{
 
-new Chart(
-document.getElementById("expenseChart"),
-{
     type:"bar",
 
     data:{
+
         labels:labels,
 
         datasets:[{
+
             label:"Expense",
 
             data:values,
 
-            backgroundColor:
-            gradient,
+            backgroundColor:gradient,
 
-            borderRadius:18,
+            borderRadius:{
+                topLeft:14,
+                topRight:14,
+                bottomLeft:0,
+                bottomRight:0
+            },
 
-            borderSkipped:false,
+            borderSkipped:"bottom",
 
-            barThickness:28,
+            barThickness:24,
 
-            hoverBackgroundColor:
-            "#8b5cf6"
+            hoverBackgroundColor:"#F4978E"
+
         }]
+
     },
 
     options:{
+
         responsive:true,
 
+        animation:{
+            duration:1000
+        },
+
         plugins:{
+
             legend:{
                 display:false
             }
+
         },
 
         scales:{
+
             x:{
+
+                ticks:{
+                    font:{
+                        size:13
+                    }
+                },
+
                 grid:{
                     display:false
                 }
+
             },
 
             y:{
+
                 beginAtZero:true,
 
                 grid:{
-                    color:"#e5e7eb"
+                    color:"#ECECEC"
                 }
+
             }
+
         }
+
     }
+
 });
 
-document
-.getElementById("chartSelector")
-.addEventListener("change",function(){
+const chartSelector =
+document.getElementById("chartSelector");
+
+chartSelector.addEventListener("change",function(){
 
     if(this.value==="pie"){
 
         window.location.href=
         "/transaction/expense/piechart";
+
+    }
+    else{
+
+        window.location.href=
+        "/transaction/expense/analytics";
+
     }
 
 });
-
 </script>

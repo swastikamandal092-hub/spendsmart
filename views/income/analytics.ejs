@@ -1,207 +1,401 @@
 <% layout("/layout/boilerplate") %>
 
-<div class="analytics-header">
+<% layout("/layout/boilerplate") %>
 
-    <h2>Income Analytics</h2>
+<%
+const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+];
+%>
 
-    <select
-        id="chartSelector"
-        class="chart-select"
-    >
+<div class="container py-4">
 
-        <option value="bar" selected>
-            📊 Bar Graph
-        </option>
+<div class="container py-4">
 
-        <option value="pie">
-            🥧 Pie Chart
-        </option>
+    <!-- Header -->
 
-    </select>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2 class="fw-bold text-success mb-0">
+            Income Analytics
+        </h2>
+
+        <select
+    id="chartSelector"
+    class="form-select shadow-sm"
+    style="width:150px;">
+
+    <option
+        value="bar"
+        <%= currentChart==="bar" ? "selected" : "" %>>
+
+        📊 Bar Graph
+
+    </option>
+
+    <option
+        value="pie"
+        <%= currentChart==="pie" ? "selected" : "" %>>
+
+        🥧 Pie Chart
+
+    </option>
+
+</select>
+
+    </div>
+
+
+    <!-- Filters -->
+
+    <div class="row g-2 mb-4">
+
+        <div class="col-md-4">
+
+           <div class="dropdown">
+
+    <button
+        class="btn btn-outline-success dropdown-toggle"
+        id="weekBtn"
+        data-bs-toggle="dropdown">
+
+        Week <%= selectedWeek %>
+
+    </button>
+
+    <ul class="dropdown-menu custom-dropdown">
+
+        <% for(let i=1;i<=5;i++){ %>
+
+            <li>
+
+                <a
+                    href="#"
+                    class="dropdown-item week-item"
+                    data-week="<%= i %>">
+
+                    Week <%= i %>
+
+                </a>
+
+            </li>
+
+        <% } %>
+
+    </ul>
+
+</div> 
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="dropdown">
+
+    <button
+        class="btn btn-outline-primary dropdown-toggle"
+        id="monthBtn"
+        data-bs-toggle="dropdown">
+
+        <%= months[selectedMonth-1] %>
+
+    </button>
+
+    <ul class="dropdown-menu custom-dropdown">
+
+        <% months.forEach((month,index)=>{ %>
+
+            <li>
+
+                <a
+                    href="#"
+                    class="dropdown-item month-item"
+                    data-month="<%= index+1 %>">
+
+                    <%= month %>
+
+                </a>
+
+            </li>
+
+        <% }) %>
+
+    </ul>
 
 </div>
 
-<div class="analytics-filter">
+        </div>
 
-    <a href="/transaction/income/analytics?filter=week"
-       class="filter-btn <%= filter==='week' ? 'active-filter' : '' %>">
-       Week
-    </a>
+        <div class="col-md-4">
 
-    <a href="/transaction/income/analytics?filter=month"
-       class="filter-btn <%= filter==='month' ? 'active-filter' : '' %>">
-       Month
-    </a>
+            <div class="dropdown">
 
-    <a href="/transaction/income/analytics?filter=year"
-       class="filter-btn <%= filter==='year' ? 'active-filter' : '' %>">
-       Year
-    </a>
+    <button
+        class="btn btn-outline-dark dropdown-toggle"
+        id="yearBtn"
+        data-bs-toggle="dropdown">
+
+        <%= selectedYear %>
+
+    </button>
+
+    <ul class="dropdown-menu custom-dropdown">
+
+        <%
+        const currentYear = new Date().getFullYear();
+        %>
+
+        <% for(let y=currentYear; y>=2000; y--){ %>
+
+            <li>
+
+                <a
+                    class="dropdown-item year-item"
+                    href="#"
+                    data-year="<%= y %>">
+
+                    <%= y %>
+
+                </a>
+
+            </li>
+
+        <% } %>
+
+    </ul>
 
 </div>
 
-<div class="chart-card">
+        </div>
 
-    <h4>Income Trend</h4>
+    </div>
 
-    <canvas id="incomeChart"></canvas>
 
+   <!-- Graph -->
+
+<div class="card shadow border-0 rounded-4">
+
+    <div class="card-body p-4">
+
+        <canvas
+            id="incomeChart"
+            height="110">
+        </canvas>
+
+        <div class="text-center mt-4">
+
+            <small
+                id="showingPeriod"
+                class="text-secondary fw-semibold">
+
+                Showing data for :
+                Week <%= selectedWeek %> •
+                <%= months[selectedMonth-1] %>
+                <%= selectedYear %>
+
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+   
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
+     
+    const showingPeriod =
+document.getElementById("showingPeriod");
 
-const incomeData =
-<%- JSON.stringify(incomeData) %>;
 
-const filter =
-"<%= filter %>";
+const selectedWeek = <%= selectedWeek %>;
+const selectedMonth = <%= selectedMonth %>;
+const selectedYear = <%= selectedYear %>;
 
-let labels = [];
-let values = [];
+function updateShowing(){
 
-if(filter === "year"){
+    showingPeriod.innerHTML =
+    `Showing data for : ${selectedWeek} • ${selectedMonth} ${selectedYear}`;
 
-    labels = [
-        "Jan","Feb","Mar","Apr",
-        "May","Jun","Jul","Aug",
-        "Sep","Oct","Nov","Dec"
-    ];
-
-    values = new Array(12).fill(0);
-
-    incomeData.forEach(e=>{
-
-        const month =
-        new Date(e.date).getMonth();
-
-        values[month] += e.amount;
-    });
 }
 
-else if(filter === "week"){
+    const monthBtn = document.getElementById("monthBtn");
+    const weekBtn = document.getElementById("weekBtn");
+    const yearBtn = document.getElementById("yearBtn");
 
-    labels = [
-        "Sun","Mon","Tue",
-        "Wed","Thu","Fri","Sat"
-    ];
+document.querySelectorAll(".month-item").forEach(item => {
 
-    values = new Array(7).fill(0);
+    item.addEventListener("click", function(e){
 
-    incomeData.forEach(e=>{
+        e.preventDefault();
 
-        const day =
-        new Date(e.date).getDay();
+        const monthNumber =
+        this.dataset.month;
 
-        values[day] += e.amount;
+        window.location.href =
+        `/transaction/income/analytics?filter=month&year=${selectedYear}&month=${monthNumber}`;
+
     });
-}
 
-else{
+});
 
-    labels = [
-        "Week 1",
-        "Week 2",
-        "Week 3",
-        "Week 4",
-        "Week 5"
-    ];
 
-    values = [0,0,0,0,0];
+document.querySelectorAll(".week-item").forEach(item => {
 
-    incomeData.forEach(e=>{
+    item.addEventListener("click", function(e){
+
+        e.preventDefault();
 
         const week =
-        Math.floor(
-            (new Date(e.date).getDate()-1)/7
-        );
+        this.dataset.week;
 
-        values[week] += e.amount;
+        window.location.href =
+        `/transaction/income/analytics?filter=week&year=${selectedYear}&month=${selectedMonth}&week=${week}`;
+
     });
-}
+
+});
+
+document.querySelectorAll(".year-item").forEach(item => {
+
+    item.addEventListener("click", function(e){
+
+        e.preventDefault();
+
+        const year =
+        this.dataset.year;
+
+        window.location.href =
+        `/transaction/income/analytics?filter=year&year=${year}&month=${selectedMonth}`;
+
+    });
+
+});
+
+const labels = <%- JSON.stringify(labels) %>;
+const values = <%- JSON.stringify(values) %>;
 
 const ctx =
 document.getElementById("incomeChart")
 .getContext("2d");
 
 const gradient =
-ctx.createLinearGradient(
-    0,0,0,400
-);
+ctx.createLinearGradient(0,0,0,400);
 
-gradient.addColorStop(
-    0,
-    "#22c55e"
-);
+gradient.addColorStop(0,"#B8F2E6");
+gradient.addColorStop(0.5,"#A5F3FC");
+gradient.addColorStop(1,"#DDD6FE");
 
-gradient.addColorStop(
-    1,
-    "#3b82f6"
-);
+new Chart(ctx,{
 
-new Chart(
-document.getElementById("incomeChart"),
-{
     type:"bar",
 
     data:{
+
         labels:labels,
 
         datasets:[{
+
             label:"Income",
 
             data:values,
 
-            backgroundColor:
-            gradient,
+            backgroundColor:gradient,
 
-            borderRadius:18,
+            borderRadius:{
+                topLeft:14,
+                topRight:14,
+                bottomLeft:0,
+                bottomRight:0
+            },
 
-            borderSkipped:false,
+            borderSkipped:"bottom",
 
-            barThickness:28,
+            barThickness:24,
 
-            hoverBackgroundColor:
-            "#16a34a"
+            hoverBackgroundColor:"#8EC5FC"
+
         }]
+
     },
 
     options:{
+
         responsive:true,
 
+        animation:{
+            duration:1000
+        },
+
         plugins:{
+
             legend:{
                 display:false
             }
+
         },
 
         scales:{
+
             x:{
+
+                ticks:{
+                    font:{
+                        size:13
+                    }
+                },
+
                 grid:{
                     display:false
                 }
+
             },
 
             y:{
+
                 beginAtZero:true,
 
                 grid:{
-                    color:"#e5e7eb"
+                    color:"#ECECEC"
                 }
+
             }
+
         }
-    }
-});
 
-document
-.getElementById("chartSelector")
-.addEventListener("change",function(){
-
-    if(this.value==="pie"){
-
-        window.location.href=
-        "/transaction/income/piechart";
     }
 
 });
+
+const chartSelector = document.getElementById("chartSelector");
+
+chartSelector.addEventListener("change", function () {
+
+    if (this.value === "pie") {
+
+        window.location.href = "/transaction/income/piechart";
+
+    } else {
+
+        window.location.href = "/transaction/income/analytics";
+
+    }
+
+});
+
 </script>
