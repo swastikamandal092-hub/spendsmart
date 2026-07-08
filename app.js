@@ -167,6 +167,10 @@ const isOwner = async (
     next();
 };
 
+app.get("/", (req, res) => {
+    res.redirect("/login");
+});
+
 app.listen(port,()=>{
     console.log("Server is listening");
 })
