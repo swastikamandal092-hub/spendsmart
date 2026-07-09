@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 8080;
+const port = 8080;
 
 const Expense=require("./models/expenseModel.js");
 const path=require("path")
@@ -16,7 +16,7 @@ const passport=require("passport");
 const Localstretagy=require("passport-local");
 const { userSchema } = require("./schema.js");
 
-const MONGO_URL = process.env.MONGO_URL ||"mongodb://127.0.0.1:27017/spentsmart";
+const MONGO_URL = "mongodb://127.0.0.1:27017/spentsmart";
 
 app.engine('ejs', ejsMate);
 app.set("view engine", "ejs")
@@ -167,9 +167,7 @@ const isOwner = async (
     next();
 };
 
-app.get("/", (req, res) => {
-    res.redirect("/login");
-});
+
 
 app.listen(port,()=>{
     console.log("Server is listening");
