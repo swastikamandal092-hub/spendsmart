@@ -1,8 +1,17 @@
 <% layout("/layout/boilerplate") %>
 <body>
-    <h2 class="mb-4">Hi <%= user.name || user.username %>, welcome👋</h2>
+    <div class="welcome-section">
 
-    
+    <h2>Hi <%= user.name || user.username %> 👋</h2>
+
+    <p>Manage your money smarter today</p>
+
+</div>
+
+    <h4 class="section-title">
+    Current Balance
+</h4>
+
     <div class="dashboard-summary">
 
     <div class="summary-card balance">
@@ -40,25 +49,24 @@
 
    <div class="quick-actions">
 
-    <a href="/transaction/income/analytics"
-       class="quick-card income-action">
-
-     Income Analytics
-
+    <a href="/transaction/new" class="quick-card">
+        <i class="fa-solid fa-plus"></i>
+        <span>Add</span>
     </a>
 
-    <a href="/transaction/expense/analytics"
-       class="quick-card expense-action">
-
-     Expense Analytics
-
+    <a href="/transactions" class="quick-card">
+        <i class="fa-solid fa-list"></i>
+        <span>History</span>
     </a>
 
-    <a href="/transactions"
-       class="quick-card transaction-action">
+    <a href="/transaction/income/analytics" class="quick-card">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Analytics</span>
+    </a>
 
-         View All Transactions
-
+    <a href="/userdetail" class="quick-card">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
     </a>
 
 </div>

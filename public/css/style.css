@@ -1094,3 +1094,63 @@ color:#5B4CF4;
 transform:scale(1.1);
 
 }
+.welcome-section{
+    margin:25px 0;
+}
+
+.welcome-section h2{
+    font-size:2rem;
+    font-weight:700;
+}
+
+.welcome-section p{
+    color:#777;
+}
+
+.section-title{
+    margin-bottom:15px;
+    font-weight:700;
+}
+
+.quick-actions{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin:30px 0;
+}
+
+.quick-card{
+    background:#fff;
+    border-radius:18px;
+    padding:20px;
+    text-align:center;
+    text-decoration:none;
+    color:#333;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+    transition:.3s;
+}
+
+.quick-card:hover{
+    transform:translateY(-5px);
+}
+
+.quick-card i{
+    font-size:26px;
+    color:#5B4CF4;
+    margin-bottom:10px;
+}
+
+.quick-card span{
+    display:block;
+    font-weight:600;
+}
+
+@media(max-width:768px){
+
+    .quick-actions{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
