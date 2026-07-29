@@ -36,14 +36,9 @@
                 <option value="expense">Expense</option>
             </select>
 
-            <label for="category">Category</label>
-            <select name="category" id="category">
-                <option value="food">Food</option>
-                <option value="rent">Rent</option>
-                <option value="salary">Salary</option>
-                <option value="other">Other Income</option>
-                <option value="investment">Investment</option>
-            </select>
+           <label for="category">Category</label>
+<select name="category" id="category">
+</select>
 
             <label for="date">Date</label>
             <input
@@ -62,3 +57,129 @@
     </div>
 
 </div>
+
+<script>
+
+const incomeCategories = [
+"Salary",
+"Freelancing",
+"Business",
+"Investment",
+"Bonus",
+"Gift Received",
+"Rental Income",
+"Refund",
+"Cashback",
+"Other Income"
+];
+
+const expenseCategories = [
+"Food",
+"Groceries",
+"Rent",
+"Electricity",
+"Water Bill",
+"Gas Bill",
+"Internet",
+"Mobile Recharge",
+"Transportation",
+"Fuel",
+"Shopping",
+"Clothing",
+"Healthcare",
+"Medicine",
+"Education",
+"Entertainment",
+"Travel",
+"Subscription",
+"EMI / Loan",
+"Personal Care",
+"Pets",
+"Charity",
+"Family",
+"Maintenance",
+"Gifts",
+"Other Expense"
+];
+
+const emojiMap = {
+
+Salary:"💼",
+Freelancing:"💻",
+Business:"🏢",
+Investment:"📈",
+Bonus:"💰",
+"Gift Received":"🎁",
+"Rental Income":"🏠",
+Refund:"💸",
+Cashback:"💳",
+"Other Income":"💵",
+
+Food:"🍔",
+Groceries:"🛒",
+Rent:"🏠",
+Electricity:"⚡",
+"Water Bill":"💧",
+"Gas Bill":"🔥",
+Internet:"📶",
+"Mobile Recharge":"📱",
+Transportation:"🚕",
+Fuel:"⛽",
+Shopping:"🛍",
+Clothing:"👕",
+Healthcare:"🏥",
+Medicine:"💊",
+Education:"🎓",
+Entertainment:"🎬",
+Travel:"✈️",
+Subscription:"📺",
+"EMI / Loan":"💳",
+"Personal Care":"🧴",
+Pets:"🐶",
+Charity:"❤️",
+Family:"👨‍👩‍👧",
+Maintenance:"🔧",
+Gifts:"🎁",
+"Other Expense":"📦"
+
+};
+
+const typeSelect = document.getElementById("type");
+const categorySelect = document.getElementById("category");
+
+function loadCategories(){
+
+    categorySelect.innerHTML="";
+
+    const list =
+    typeSelect.value==="income"
+    ? incomeCategories
+    : expenseCategories;
+
+    list.forEach(item=>{
+
+        const option=document.createElement("option");
+
+        option.value=item;          
+
+        option.textContent=
+        `${emojiMap[item]} ${item}`;
+
+        categorySelect.appendChild(option);
+
+    });
+
+}
+
+loadCategories();
+
+typeSelect.addEventListener(
+"change",
+loadCategories
+);
+// Restrict future dates
+
+document.getElementById("date").max =
+new Date().toISOString().split("T")[0];
+
+</script>

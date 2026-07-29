@@ -8,15 +8,30 @@
 
         <h2>Profile</h2>
 
-        <div class="profile-avatar">
+        <% if(user.profileImage){ %>
 
-            <%= user.name.charAt(0).toUpperCase() %>
+<div class="profile-avatar">
 
-        </div>
+    <img
+    src="/uploads/<%= user.profileImage %>"
+    alt="Profile">
+
+</div>
+
+<% } else { %>
+
+<div class="profile-avatar">
+
+    <%= user.name.charAt(0).toUpperCase() %>
+
+</div>
+
+<% } %>
 
         <form
-        action="/userdetail/change"
-        method="POST">
+action="/userdetail/change"
+method="POST"
+enctype="multipart/form-data">
 
             <label>Name</label>
 
@@ -24,6 +39,13 @@
             type="text"
             name="name"
             value="<%= user.name %>">
+
+            <label>Profile Photo</label>
+
+<input
+type="file"
+name="profileImage"
+accept="image/*">
 
             <label>Username</label>
 

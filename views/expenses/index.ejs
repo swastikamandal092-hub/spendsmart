@@ -29,6 +29,11 @@
 
     <h3>Income vs Expense Trend</h3>
 
+    <p class="text-muted mb-3">
+    Showing data for:
+    <strong><%= currentMonth %>, <%= currentYear %></strong>
+</p>
+
     <canvas id="dashboardTrend"></canvas>
 
 </div>
@@ -175,35 +180,45 @@ new Chart(ctx,{
 
         {
 
-            label:"Income",
+    label:"Income",
 
-            data:incomeValues,
+    data:incomeValues,
 
-            backgroundColor:
-            incomeGradient,
+    backgroundColor:
+    incomeGradient,
 
-            borderRadius:18,
+    borderRadius:{
+        topLeft:18,
+        topRight:18,
+        bottomLeft:0,
+        bottomRight:0
+    },
 
-            borderSkipped:false,
+    borderSkipped:"bottom",
 
-            barThickness:22
+    barThickness:22
 
-        },
+},
 
         {
 
             label:"Expense",
 
-            data:expenseValues,
+    data:expenseValues,
 
-            backgroundColor:
-            expenseGradient,
+    backgroundColor:
+    expenseGradient,
 
-            borderRadius:18,
+    borderRadius:{
+        topLeft:18,
+        topRight:18,
+        bottomLeft:0,
+        bottomRight:0
+    },
 
-            borderSkipped:false,
+    borderSkipped:"bottom",
 
-            barThickness:22
+    barThickness:22
 
         }
 

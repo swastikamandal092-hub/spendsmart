@@ -1,6 +1,8 @@
+require("dotenv").config();
+
 const express = require("express");
 const app = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 const Expense=require("./models/expenseModel.js");
 const path=require("path")
@@ -15,8 +17,36 @@ const User=require("./models/user.js");
 const passport=require("passport");
 const Localstretagy=require("passport-local");
 const { userSchema } = require("./schema.js");
+const multer = require("multer");
+const fs = require("fs");
 
-const MONGO_URL = "mongodb://127.0.0.1:27017/spentsmart";
+const MONGO_URL = const MONGO_URL = process.env.MONGO_URL;
+const uploadPath = path.join(__dirname, "public/uploads");
+
+if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+
+    destination: function (req, file, cb) {
+
+        cb(null, uploadPath);
+
+    },
+
+    filename: function (req, file, cb) {
+
+        const uniqueName =
+            Date.now() + "-" + file.originalname;
+
+        cb(null, uniqueName);
+
+    }
+
+});
+
+const upload = multer({ storage });
 
 app.engine('ejs', ejsMate);
 app.set("view engine", "ejs")
@@ -35,7 +65,7 @@ async function main() {
   await mongoose.connect(MONGO_URL);
 }
 const sessionOption={
-    secret:"mySecret",
+    secret:process.env.SESSION_SECRET || "mySecret",
     resave:false,
      saveUninitialized:true,
     cookie:{
@@ -169,13 +199,11 @@ const isOwner = async (
 
 
 
-app.listen(port,()=>{
-    console.log("Server is listening");
-})
-
 app.get("/transaction",
     userLoggedin,
     wrapAsync(async (req, res) => {
+
+    const now = new Date();
 
     const recentTransactions =
     await Expense.find({
@@ -184,9 +212,25 @@ app.get("/transaction",
     .sort({ date:-1 })
     .limit(5);
 
+    const startOfMonth = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1
+    );
+
+    const endOfMonth = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0,
+        23,
+        59,
+        59
+    );
+
     const allexpenses =
     await Expense.find({
-        user:req.user._id
+        user:req.user._id,
+        date: { $gte: startOfMonth, $lte: endOfMonth }
     });
 
     let totalIncome = 0;
@@ -204,6 +248,14 @@ app.get("/transaction",
 
     const currentBalance =
         req.user.balance + totalIncome - totalExpense;
+   
+        const currentMonth =
+now.toLocaleString("en-US",{
+    month:"long"
+});
+
+const currentYear =
+now.getFullYear();
 
         const chartLabels = [
     "Week 1",
@@ -243,7 +295,9 @@ allexpenses.forEach(e=>{
 
     chartLabels,
     incomeValues,
-    expenseValues
+    expenseValues,
+    currentMonth,
+    currentYear
 });
 }));
 // create new transaction -get 
@@ -319,19 +373,32 @@ app.get("/userdetail", userLoggedin, wrapAsync(async (req, res) => {
 app.post(
     "/userdetail/change",
     userLoggedin,
+    upload.single("profileImage"),
     wrapAsync(async (req, res) => {
 
-        const { name, age } = req.body;
+       const { name, age } = req.body;
 
-        await User.findByIdAndUpdate(
-            req.user._id,
-            {
-                name,
-                age
-            }
-        );
+const updateData = {
+    name,
+    age
+};
 
-        res.redirect("/transaction");
+if(req.file){
+
+    updateData.profileImage =
+    req.file.filename;
+
+}
+
+await User.findByIdAndUpdate(
+
+    req.user._id,
+
+    updateData
+
+);
+
+res.redirect("/transaction");
 }));
 
 app.get(
@@ -794,4 +861,8 @@ app.use((req,res,next)=>{
 app.use((err,req,res,next)=>{
     let{status=500,message="Something wrong"}=err;
     res.status(status).send(message);
+})
+
+app.listen(port,()=>{
+    console.log("Server is listening");
 })

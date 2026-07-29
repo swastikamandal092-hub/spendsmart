@@ -32,6 +32,11 @@ const userSchema = new Schema({
     expenditure: {
         type: Number,
         default: 0
+    },
+
+    profileImage: {
+        type: String,
+        default: ""
     }
 });
 
