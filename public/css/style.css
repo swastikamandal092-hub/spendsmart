@@ -1013,87 +1013,7 @@ hr{
 .custom-dropdown::-webkit-scrollbar-track{
     background:transparent;
 }
-/* ========= TOP BAR ========= */
 
-.topbar{
-
-position:sticky;
-
-top:0;
-
-z-index:1000;
-
-height:70px;
-
-background:#ffffff;
-
-display:flex;
-
-justify-content:space-between;
-
-align-items:center;
-
-padding:0 20px;
-
-box-shadow:0 4px 15px rgba(0,0,0,.08);
-
-}
-
-.logo{
-
-display:flex;
-
-align-items:center;
-
-gap:10px;
-
-font-size:22px;
-
-font-weight:700;
-
-color:#5B4CF4;
-
-}
-
-.logo i{
-
-font-size:26px;
-
-}
-
-.logo span{
-
-color:#222;
-
-}
-
-.nav-icons{
-
-display:flex;
-
-gap:18px;
-
-}
-
-.nav-icons a{
-
-text-decoration:none;
-
-color:#555;
-
-font-size:22px;
-
-transition:.3s;
-
-}
-
-.nav-icons a:hover{
-
-color:#5B4CF4;
-
-transform:scale(1.1);
-
-}
 .welcome-section{
     margin:25px 0;
 }
@@ -1153,4 +1073,39 @@ transform:scale(1.1);
 
     }
 
+}
+/* ===== Navbar Update ===== */
+
+.left-section{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.right-section{
+    display:flex;
+    align-items:center;
+}
+
+.menu-btn{
+    background:none;
+    border:none;
+    font-size:22px;
+    cursor:pointer;
+    color:#333;
+    padding:0;
+}
+
+.menu-btn:hover{
+    color:#5B4CF4;
+}
+
+.logo{
+    text-decoration:none;
+}
+
+.right-section a{
+    color:#555;
+    font-size:22px;
+    text-decoration:none;
 }

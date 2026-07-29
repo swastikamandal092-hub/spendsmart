@@ -1,0 +1,69 @@
+/* =========================
+   NAVBAR
+========================= */
+
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    height:70px;
+    background:#fff;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 20px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.left-section{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    font-size:22px;
+    font-weight:700;
+    color:#5B4CF4;
+}
+
+.logo span{
+    color:#222;
+}
+
+.logo i{
+    font-size:24px;
+}
+
+.menu-btn{
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-size:22px;
+    color:#444;
+}
+
+.menu-btn:hover{
+    color:#5B4CF4;
+}
+
+.right-section{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+.right-section a{
+    color:#555;
+    font-size:22px;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.right-section a:hover{
+    color:#5B4CF4;
+}
