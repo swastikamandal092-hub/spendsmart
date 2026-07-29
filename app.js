@@ -20,7 +20,7 @@ const { userSchema } = require("./schema.js");
 const multer = require("multer");
 const fs = require("fs");
 
-const MONGO_URL = const MONGO_URL = process.env.MONGO_URL;
+const MONGO_URL = process.env.MONGO_URL;
 const uploadPath = path.join(__dirname, "public/uploads");
 
 if (!fs.existsSync(uploadPath)) {
