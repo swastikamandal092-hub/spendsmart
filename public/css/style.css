@@ -1013,3 +1013,84 @@ hr{
 .custom-dropdown::-webkit-scrollbar-track{
     background:transparent;
 }
+/* ========= TOP BAR ========= */
+
+.topbar{
+
+position:sticky;
+
+top:0;
+
+z-index:1000;
+
+height:70px;
+
+background:#ffffff;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:0 20px;
+
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+
+}
+
+.logo{
+
+display:flex;
+
+align-items:center;
+
+gap:10px;
+
+font-size:22px;
+
+font-weight:700;
+
+color:#5B4CF4;
+
+}
+
+.logo i{
+
+font-size:26px;
+
+}
+
+.logo span{
+
+color:#222;
+
+}
+
+.nav-icons{
+
+display:flex;
+
+gap:18px;
+
+}
+
+.nav-icons a{
+
+text-decoration:none;
+
+color:#555;
+
+font-size:22px;
+
+transition:.3s;
+
+}
+
+.nav-icons a:hover{
+
+color:#5B4CF4;
+
+transform:scale(1.1);
+
+}
