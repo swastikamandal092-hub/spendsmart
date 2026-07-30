@@ -67,3 +67,69 @@
 .right-section a:hover{
     color:#5B4CF4;
 }
+
+/* =========================
+   SIDE MENU
+========================= */
+
+.side-menu{
+
+position:fixed;
+
+top:70px;
+
+left:-280px;
+
+width:260px;
+
+height:100%;
+
+background:white;
+
+box-shadow:5px 0 20px rgba(0,0,0,.15);
+
+transition:.35s;
+
+z-index:999;
+
+padding:20px;
+
+}
+
+.side-menu.active{
+
+left:0;
+
+}
+
+.side-menu a{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+padding:15px;
+
+margin-bottom:10px;
+
+border-radius:12px;
+
+text-decoration:none;
+
+color:#333;
+
+font-weight:600;
+
+transition:.3s;
+
+}
+
+.side-menu a:hover{
+
+background:#f3f0ff;
+
+color:#5B4CF4;
+
+}

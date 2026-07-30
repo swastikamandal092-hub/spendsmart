@@ -1,0 +1,7 @@
+@media(max-width:768px){
+
+    .quick-actions{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }

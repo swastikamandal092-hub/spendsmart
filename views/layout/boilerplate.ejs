@@ -30,6 +30,29 @@
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous">
       </script>
+
+      <script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const menuBtn = document.getElementById("menuBtn");
+    const sideMenu = document.getElementById("sideMenu");
+
+    console.log("menuBtn:", menuBtn);
+    console.log("sideMenu:", sideMenu);
+
+    if (menuBtn && sideMenu) {
+        menuBtn.addEventListener("click", function () {
+            sideMenu.classList.toggle("active");
+            console.log("Menu toggled");
+        });
+    } else {
+        console.error("menuBtn or sideMenu not found!");
+    }
+
+});
+</script>
       
 </body>
 </html>
