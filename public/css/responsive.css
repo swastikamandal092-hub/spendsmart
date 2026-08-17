@@ -1,0 +1,309 @@
+/* =========================================================
+   SPENDSMART RESPONSIVE LAYOUT
+   Works together with navbar.css
+========================================================= */
+
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+img,
+canvas,
+svg {
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   DESKTOP
+========================================================= */
+
+@media (min-width: 769px) {
+
+    /*
+     * Desktop sidebar is 250px wide.
+     * navbar.css already handles the main content offset.
+     */
+
+    .container-fluid {
+        width: 100%;
+        max-width: 100%;
+    }
+
+
+    /*
+     * Prevent Bootstrap containers from creating
+     * unexpected horizontal overflow.
+     */
+
+    .row {
+        max-width: 100%;
+    }
+
+
+    /*
+     * Keep dashboard/transaction content
+     * within a comfortable reading width.
+     */
+
+    .dashboard-summary,
+    .quick-actions,
+    .expenses,
+    .trend-card {
+        max-width: 100%;
+    }
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (min-width: 769px) and (max-width: 1100px) {
+
+    .app-content {
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+
+
+    /*
+     * Slightly reduce card gaps on smaller desktop/tablet
+     */
+
+    .dashboard-summary {
+        gap: 14px;
+    }
+
+    .quick-actions {
+        gap: 12px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    /*
+     * Desktop sidebar is hidden by navbar.css.
+     * Main content uses the complete screen width.
+     */
+
+    .container-fluid {
+        width: 100%;
+        max-width: 100%;
+
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+
+    /*
+     * Bootstrap row can sometimes create
+     * horizontal overflow because of negative margins.
+     */
+
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+
+    /*
+     * Columns should not exceed viewport width.
+     */
+
+    [class*="col-"] {
+        max-width: 100%;
+    }
+
+
+    /*
+     * Dashboard summary cards
+     */
+
+    .dashboard-summary {
+        width: 100%;
+
+        grid-template-columns: 1fr;
+
+        gap: 12px;
+    }
+
+
+    /*
+     * Quick actions
+     */
+
+    .quick-actions {
+        width: 100%;
+
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        gap: 10px;
+    }
+
+
+    /*
+     * Transaction cards
+     */
+
+    .expenses {
+        width: 100%;
+
+        max-width: 100%;
+
+        overflow: hidden;
+    }
+
+
+    /*
+     * Transaction header should never
+     * push outside the screen.
+     */
+
+    .expense-header {
+        min-width: 0;
+    }
+
+    .expense-header > div {
+        min-width: 0;
+    }
+
+
+    /*
+     * Long transaction names/categories
+     */
+
+    .expense-header h4,
+    .category {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    /*
+     * Charts
+     */
+
+    .trend-card,
+    .chart-card {
+        width: 100%;
+        max-width: 100%;
+
+        overflow: hidden;
+    }
+
+
+    canvas {
+        max-width: 100% !important;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .dashboard-summary {
+        gap: 10px;
+    }
+
+
+    .quick-actions {
+        gap: 8px;
+    }
+
+
+    /*
+     * Prevent buttons/forms from becoming
+     * wider than the viewport.
+     */
+
+    button,
+    .btn,
+    input,
+    select,
+    textarea {
+        max-width: 100%;
+    }
+
+
+    /*
+     * Smaller horizontal padding
+     */
+
+    .app-content {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+
+    /*
+     * Transaction action buttons can wrap
+     * instead of overflowing.
+     */
+
+    .action-buttons {
+        max-width: 100%;
+
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap: 7px;
+    }
+
+
+    /*
+     * Analytics filters
+     */
+
+    .analytics-filter,
+    .graph-buttons {
+        max-width: 100%;
+
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap: 8px;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 360px) {
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+
+    .app-content {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+}

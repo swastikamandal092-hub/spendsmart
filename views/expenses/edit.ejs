@@ -1,0 +1,30 @@
+<% layout("/layout/boilerplate") %>
+<body>
+     <form  method="POST" action="/transaction/<%= exp._id %>?_method=PUT">
+        <label for="title">Title:</label>
+        <input type="text" value="<%= exp.title %>" name="title" id="title">
+        <br>
+        <label for="amount">Amount:</label>
+        <input type="number" value="<%= exp.amount %>" name="amount" id="">
+        <br>
+        <label for="type">Choose type:</label>
+        <select name="type">
+  <option value="income" <%= exp.type === "income" ? "selected" : "" %>>Income</option>
+  <option value="expense" <%= exp.type === "expense" ? "selected" : "" %>>Expense</option>
+</select>
+        <br>
+        <label for="category">Choose category:</label>
+        <select name="category">
+  <option value="food" <%= exp.category==="food"?"selected":"" %>>Food</option>
+  <option value="rent" <%= exp.category==="rent"?"selected":"" %>>Rent</option>
+  <option value="salary" <%= exp.category==="salary"?"selected":"" %>>Salary</option>
+  <option value="investment" <%= exp.category==="investment"?"selected":"" %>>Investment</option>
+</select>
+        <br>
+        <label for="date">Date</label>
+        <input type="date" name="date" value="<%= exp.date.toISOString().split('T')[0] %>" id="">
+        <br>
+        <button>Submit</button>
+    </form>
+</body>
+</html>

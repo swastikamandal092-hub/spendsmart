@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    line graph for income
+
+    <select id="graphType">
+        <option value="">Select</option>
+        <option value="/transaction/income/piechart">
+            Pie Chart
+        </option>
+        <option value="/transaction/income/linegraph">
+            Line Graph
+        </option>
+    </select>
+
+    <script>
+        document
+        .getElementById("graphType")
+        .addEventListener("change", function () {
+
+            const selectedPage = this.value;
+
+            if(selectedPage){
+                window.location.href = selectedPage;
+            }
+        });
+    </script>
+
+</body>
+</html>

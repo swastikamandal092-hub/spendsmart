@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    line graph for expense
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Graph</title>
+</head>
+<body>
+
+    <h2>Expense Graph</h2>
+
+    <select id="graphType">
+
+        <option value="">
+            Select Graph
+        </option>
+
+        <option value="/transaction/expense/linegraph">
+            Line Graph
+        </option>
+
+        <option value="/transaction/expense/piechart">
+            Pie Chart
+        </option>
+
+    </select>
+
+    <script>
+        document
+        .getElementById("graphType")
+        .addEventListener("change", function () {
+
+            const selectedPage = this.value;
+
+            if (selectedPage) {
+                window.location.href = selectedPage;
+            }
+
+        });
+    </script>
+
+</body>
+</html>
+</body>
+</html>

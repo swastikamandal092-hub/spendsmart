@@ -1,0 +1,152 @@
+<!-- Desktop Sidebar Navigation -->
+<aside class="app-sidebar" id="appSidebar" aria-label="Main navigation">
+
+    <a href="/transaction" class="sidebar-brand">
+        <span class="brand-icon">
+            <i class="fa-solid fa-wallet"></i>
+        </span>
+        <span>SpendSmart</span>
+    </a>
+
+    <nav class="sidebar-nav">
+
+        <a href="/transaction"
+           class="nav-item"
+           data-nav="dashboard">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="/transactions"
+           class="nav-item"
+           data-nav="transactions">
+            <i class="fa-solid fa-list"></i>
+            <span>Transactions</span>
+        </a>
+
+        <a href="/transaction/new"
+           class="nav-item"
+           data-nav="add">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Transaction</span>
+        </a>
+
+        <!-- Income Analytics -->
+        <a href="/transaction/income/analytics"
+           class="nav-item"
+           data-nav="income-analytics">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Income Analytics</span>
+        </a>
+
+        <!-- Expense Analytics -->
+        <a href="/transaction/expense/analytics"
+           class="nav-item"
+           data-nav="expense-analytics">
+            <i class="fa-solid fa-chart-column"></i>
+            <span>Expense Analytics</span>
+        </a>
+
+        <a href="/userdetail"
+           class="nav-item"
+           data-nav="profile">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </a>
+
+    </nav>
+
+    <a href="/logout"
+       class="nav-item sidebar-logout"
+       data-nav="logout">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Logout</span>
+    </a>
+
+</aside>
+
+
+<!-- Mobile Top Navigation -->
+<header class="mobile-topbar">
+
+    <a href="/transaction" class="mobile-brand">
+        <span class="brand-icon">
+            <i class="fa-solid fa-wallet"></i>
+        </span>
+
+        <span>SpendSmart</span>
+    </a>
+
+    <button
+        type="button"
+        id="mobileMenuBtn"
+        class="mobile-menu-btn"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="mobileNavMenu">
+
+        <i class="fa-solid fa-bars"></i>
+
+    </button>
+
+
+    <!-- Opaque Floating Mobile Menu -->
+    <div
+        id="mobileNavMenu"
+        class="mobile-nav-menu"
+        aria-hidden="true">
+
+        <a href="/transaction"
+           class="mobile-nav-item"
+           data-nav="dashboard">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="/transactions"
+           class="mobile-nav-item"
+           data-nav="transactions">
+            <i class="fa-solid fa-list"></i>
+            <span>Transactions</span>
+        </a>
+
+        <a href="/transaction/new"
+           class="mobile-nav-item"
+           data-nav="add">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Transaction</span>
+        </a>
+
+        <!-- Income Analytics -->
+        <a href="/transaction/income/analytics"
+           class="mobile-nav-item"
+           data-nav="income-analytics">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Income Analytics</span>
+        </a>
+
+        <!-- Expense Analytics -->
+        <a href="/transaction/expense/analytics"
+           class="mobile-nav-item"
+           data-nav="expense-analytics">
+            <i class="fa-solid fa-chart-column"></i>
+            <span>Expense Analytics</span>
+        </a>
+
+        <a href="/userdetail"
+           class="mobile-nav-item"
+           data-nav="profile">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </a>
+
+        <a href="/logout"
+           class="mobile-nav-item mobile-logout"
+           data-nav="logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+
+    </div>
+
+</header>

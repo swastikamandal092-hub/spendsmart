@@ -1,0 +1,135 @@
+<% layout("/layout/boilerplate") %>
+
+<div class="analytics-header">
+
+    <h2>Income Categories</h2>
+
+    <select
+        id="chartSelector"
+        class="chart-select"
+    >
+        <option value="bar">
+            📊 Bar Graph
+        </option>
+
+        <option value="pie" selected>
+            🥧 Pie Chart
+        </option>
+
+    </select>
+
+</div>
+
+<div class="chart-card pie-card">
+
+    <div class="doughnut-wrapper">
+
+        <canvas id="incomePie"></canvas>
+
+    </div>
+
+    <div class="category-summary">
+
+    <p>
+        <strong>Top Category:</strong>
+        <span id="topCategory"></span>
+    </p>
+
+    <p>
+        <strong>Total Categories:</strong>
+        <span id="totalCategories"></span>
+    </p>
+
+</div>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+document
+.getElementById("chartSelector")
+.addEventListener("change",function(){
+
+    if(this.value==="bar"){
+
+        window.location.href=
+        "/transaction/income/analytics";
+    }
+
+});
+
+const incomeData =
+<%- JSON.stringify(incomeData) %>;
+
+const categoryTotals = {};
+
+incomeData.forEach(e=>{
+
+    if(!categoryTotals[e.category]){
+
+        categoryTotals[e.category]=0;
+    }
+
+    categoryTotals[e.category]+=e.amount;
+});
+
+const sortedCategories =
+Object.entries(categoryTotals)
+.sort((a,b)=>b[1]-a[1]);
+
+const topCategory =
+sortedCategories[0]?.[0] || "N/A";
+
+document.getElementById(
+    "topCategory"
+).innerText = topCategory;
+
+document.getElementById(
+    "totalCategories"
+).innerText =
+Object.keys(categoryTotals).length;
+
+new Chart(
+document.getElementById("incomePie"),
+{
+    type:"doughnut",
+
+    data:{
+
+        labels:
+        Object.keys(categoryTotals),
+
+        datasets:[{
+
+            data:
+            Object.values(categoryTotals),
+
+            backgroundColor:[
+                "#22c55e",
+                "#3b82f6",
+                "#06b6d4",
+                "#a855f7",
+                "#f59e0b"
+            ]
+        }]
+    },
+
+    options:{
+
+        responsive:true,
+
+        cutout:"65%",
+
+        plugins:{
+
+            legend:{
+                position:"right"
+            }
+        }
+    }
+});
+
+</script>

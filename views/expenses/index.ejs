@@ -1,0 +1,284 @@
+<% layout("/layout/boilerplate") %>
+<body>
+    <div class="welcome-section">
+
+    <h2>Hi <%= user.name || user.username %> 👋</h2>
+
+    <p>Manage your money smarter today</p>
+
+</div>
+
+    <h4 class="section-title">
+    Current Balance
+</h4>
+
+    <div class="dashboard-summary">
+
+    <div class="summary-card balance">
+        <p>Balance</p>
+        <h2>₹ <%= currentBalance %></h2>
+    </div>
+
+    <a href="/transaction/income/analytics" class="summary-card income">
+        <p>Total Income</p>
+        <h2>₹ <%= totalIncome %></h2>
+    </a>
+
+    <a href="/transaction/expense/analytics" class="summary-card expense">
+        <p>Total Expense</p>
+        <h2>₹ <%= totalExpense %></h2>
+    </a>
+
+
+
+</div>
+
+
+<div class="trend-card">
+
+    <h3>Income vs Expense Trend</h3>
+
+    <p class="text-muted mb-3">
+    Showing data for:
+    <strong><%= currentMonth %>, <%= currentYear %></strong>
+</p>
+
+    <canvas id="dashboardTrend"></canvas>
+
+<!-- Dashboard Quick Actions -->
+<div class="quick-actions">
+
+    <!-- Add Transaction -->
+    <a href="/transaction/new" class="quick-card">
+        <i class="fa-solid fa-plus"></i>
+        <span>Add Transaction</span>
+    </a>
+
+    <!-- All Transactions -->
+    <a href="/transactions" class="quick-card">
+        <i class="fa-solid fa-list"></i>
+        <span>Transactions</span>
+    </a>
+
+    <!-- Income Analytics -->
+    <a href="/transaction/income/analytics" class="quick-card">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Income Analytics</span>
+    </a>
+
+    <!-- Expense Analytics -->
+    <a href="/transaction/expense/analytics" class="quick-card">
+        <i class="fa-solid fa-chart-column"></i>
+        <span>Expense Analytics</span>
+    </a>
+
+</div>
+
+<h3 class="recent-heading">
+    Recent Transactions
+</h3>
+
+
+    <% for(let e of recentTransactions){ %>
+        <div class="expenses">
+
+    <div class="expense-header">
+        <div>
+            <h4><%= e.title %></h4>
+            <p class="category">
+                <%= e.category %> • <%= e.type %>
+            </p>
+        </div>
+
+        <div class="amount <%= e.type %>">
+            ₹<%= e.amount %>
+        </div>
+    </div>
+
+    <div class="expense-footer">
+        <span>
+            <%= e.date.toString().split(" ").slice(0,4).join(" ") %>
+        </span>
+
+        <div class="action-buttons">
+
+            <form method="get" action="/transaction/<%= e._id %>/edit">
+                <button class="btn btn-primary">Edit</button>
+            </form>
+
+            <form method="post" action="/transaction/<%= e._id %>?_method=DELETE">
+                <button class="btn btn-danger">Delete</button>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+        
+    <% } %>
+
+    <!-- View All Transactions -->
+<a href="/transactions" class="view-all-transactions-card">
+
+    <div class="view-all-icon">
+        <i class="fa-solid fa-list"></i>
+    </div>
+
+    <div class="view-all-text">
+        <span>View All Transactions</span>
+        <small>See your complete transaction history</small>
+    </div>
+
+    <div class="view-all-arrow">
+        <i class="fa-solid fa-arrow-right"></i>
+    </div>
+
+</a>
+    
+   
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+const chartLabels =
+<%- JSON.stringify(chartLabels) %>;
+
+const incomeValues =
+<%- JSON.stringify(incomeValues) %>;
+
+const expenseValues =
+<%- JSON.stringify(expenseValues) %>;
+
+const ctx =
+document.getElementById("dashboardTrend")
+.getContext("2d");
+
+const incomeGradient =
+ctx.createLinearGradient(
+0,
+0,
+0,
+400
+);
+
+incomeGradient.addColorStop(
+0,
+"#22c55e"
+);
+
+incomeGradient.addColorStop(
+0.5,
+"#16a34a"
+);
+
+incomeGradient.addColorStop(
+1,
+"#15803d"
+);
+
+const expenseGradient =
+ctx.createLinearGradient(
+0,
+0,
+0,
+400
+);
+
+expenseGradient.addColorStop(
+0,
+"#ef4444"
+);
+
+expenseGradient.addColorStop(
+0.5,
+"#dc2626"
+);
+
+expenseGradient.addColorStop(
+1,
+"#991b1b"
+);
+new Chart(ctx,{
+
+    type:"bar",
+
+    data:{
+
+        labels:chartLabels,
+
+        datasets:[
+
+        {
+
+    label:"Income",
+
+    data:incomeValues,
+
+    backgroundColor:
+    incomeGradient,
+
+    borderRadius:{
+        topLeft:18,
+        topRight:18,
+        bottomLeft:0,
+        bottomRight:0
+    },
+
+    borderSkipped:"bottom",
+
+    barThickness:22
+
+},
+
+        {
+
+            label:"Expense",
+
+    data:expenseValues,
+
+    backgroundColor:
+    expenseGradient,
+
+    borderRadius:{
+        topLeft:18,
+        topRight:18,
+        bottomLeft:0,
+        bottomRight:0
+    },
+
+    borderSkipped:"bottom",
+
+    barThickness:22
+
+        }
+
+        ]
+    },
+
+    options:{
+
+        responsive:true,
+
+        plugins:{
+
+            legend:{
+                position:"top"
+            }
+        },
+
+        scales:{
+
+            x:{
+                grid:{
+                    display:false
+                }
+            },
+
+            y:{
+                beginAtZero:true
+            }
+        }
+    }
+});
+</script>
+</body>
+</html>

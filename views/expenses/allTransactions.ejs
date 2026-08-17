@@ -1,0 +1,57 @@
+<% layout("/layout/boilerplate") %>
+
+<h2 class="mb-4">All Transactions</h2>
+
+<% for(let e of allexpenses){ %>
+
+<div class="expenses">
+
+    <div class="expense-header">
+
+        <div>
+            <h4><%= e.title %></h4>
+
+            <p class="category">
+                <%= e.category %> • <%= e.type %>
+            </p>
+        </div>
+
+        <div class="amount <%= e.type %>">
+            ₹<%= e.amount %>
+        </div>
+
+    </div>
+
+    <div class="expense-footer">
+
+        <span>
+            <%= e.date.toString().split(" ").slice(0,4).join(" ") %>
+        </span>
+
+        <div class="action-buttons">
+
+            <form method="get"
+                  action="/transaction/<%= e._id %>/edit">
+
+                <button class="btn btn-primary">
+                    Edit
+                </button>
+
+            </form>
+
+            <form method="post"
+                  action="/transaction/<%= e._id %>?_method=DELETE">
+
+                <button class="btn btn-danger">
+                    Delete
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<% } %>
