@@ -243,13 +243,33 @@
             return;
         }
 
-        if (reduceMotion || !("IntersectionObserver" in window)) {
-            Array.prototype.forEach.call(nodes, function (el) {
-                el.classList.add("is-visible");
-            });
+        var list = Array.prototype.slice.call(nodes);
 
+        function show(el) {
+            el.classList.add("is-visible");
+        }
+
+        function showAll() {
+            list.forEach(show);
+        }
+
+        if (reduceMotion || !("IntersectionObserver" in window)) {
+            showAll();
             return;
         }
+
+        var revealedAny = false;
+
+        /*
+         * Fail open. Browsers throttle observers in background tabs, and
+         * embedded previews may never deliver a callback at all, so make
+         * sure the content becomes visible even if nothing intersects.
+         */
+        var guard = window.setTimeout(function () {
+            if (!revealedAny) {
+                showAll();
+            }
+        }, 900);
 
         var observer = new IntersectionObserver(function (entries) {
             entries.forEach(function (entry) {
@@ -257,11 +277,15 @@
                     return;
                 }
 
+                revealedAny = true;
+
+                window.clearTimeout(guard);
+
                 var el = entry.target;
                 var delay = parseInt(el.getAttribute("data-reveal"), 10) || 0;
 
                 window.setTimeout(function () {
-                    el.classList.add("is-visible");
+                    show(el);
                 }, delay);
 
                 observer.unobserve(el);
@@ -271,7 +295,8 @@
             rootMargin: "0px 0px -40px 0px"
         });
 
-        Array.prototype.forEach.call(nodes, function (el) {
+        list.forEach(function (el) {
+            el.classList.add("reveal-pending");
             observer.observe(el);
         });
     }

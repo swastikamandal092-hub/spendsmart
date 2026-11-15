@@ -2358,7 +2358,14 @@ select.is-hidden {
    21. REVEAL ANIMATION
 ========================================================= */
 
-[data-reveal] {
+/*
+ * Reveal is opt-in from JS via `.reveal-pending`, added by /js/ui.js
+ * only once the observer is wired up. Content is therefore never left
+ * hidden when scripting, IntersectionObserver, or a foreground tab is
+ * unavailable - the worst case is no animation, never a blank page.
+ */
+
+.reveal-pending {
     opacity: 0;
 
     transform: translateY(14px);
@@ -2368,7 +2375,7 @@ select.is-hidden {
         transform 0.55s var(--ease);
 }
 
-[data-reveal].is-visible {
+.reveal-pending.is-visible {
     opacity: 1;
 
     transform: none;
@@ -2699,7 +2706,7 @@ select.is-hidden {
         scroll-behavior: auto !important;
     }
 
-    [data-reveal] {
+    .reveal-pending {
         opacity: 1;
         transform: none;
     }
