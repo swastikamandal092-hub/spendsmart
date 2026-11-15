@@ -342,20 +342,22 @@ p {
     align-items: center;
     justify-content: center;
 
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
 
-    margin-right: 6px;
+    margin-right: 8px;
 
     border-radius: 50%;
 
     background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    border: 2px solid rgba(255, 255, 255, 0.65);
 
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 800;
 
     vertical-align: middle;
+
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.22);
 
     overflow: hidden;
 }
@@ -1897,6 +1899,176 @@ select.is-hidden {
     font-weight: 600;
 }
 
+/* =========================================================
+   AVATAR UPLOADER (Instagram / Facebook style)
+   The avatar itself is the picker: click or tap it and the
+   chosen photo previews immediately, before saving.
+========================================================= */
+
+.profile-avatar-zone {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: -48px;
+    margin-bottom: 24px;
+
+    text-align: center;
+}
+
+.avatar-input {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    opacity: 0;
+}
+
+.avatar-uploader {
+    position: relative;
+
+    display: inline-flex;
+
+    padding: 0;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: none;
+
+    line-height: 0;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+.profile-avatar-zone .profile-avatar {
+    width: 116px;
+    height: 116px;
+
+    margin: 0;
+
+    border-width: 4px;
+
+    font-size: 2.5rem;
+
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
+
+    transition:
+        transform 0.25s var(--ease),
+        box-shadow 0.25s var(--ease);
+}
+
+.avatar-uploader:hover .profile-avatar,
+.avatar-uploader:focus-within .profile-avatar {
+    transform: scale(1.03);
+
+    box-shadow: 0 22px 42px rgba(15, 23, 42, 0.26);
+}
+
+.avatar-input:focus-visible ~ .avatar-uploader .profile-avatar {
+    box-shadow:
+        0 0 0 4px #ffffff,
+        0 0 0 8px rgba(91, 76, 244, 0.55);
+}
+
+.avatar-overlay {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    border-radius: 50%;
+
+    background: rgba(15, 23, 42, 0.55);
+    color: #ffffff;
+
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    opacity: 0;
+
+    transition: opacity 0.2s var(--ease);
+
+    pointer-events: none;
+}
+
+.avatar-overlay i {
+    font-size: 1.05rem;
+}
+
+/* Only offer the hover state where a real pointer exists */
+
+@media (hover: hover) {
+    .avatar-uploader:hover .avatar-overlay,
+    .avatar-uploader:focus-within .avatar-overlay {
+        opacity: 1;
+    }
+}
+
+.avatar-badge {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+
+    background: linear-gradient(135deg, var(--brand), #7c3aed);
+    color: #ffffff;
+
+    font-size: 0.78rem;
+
+    box-shadow: 0 8px 16px rgba(91, 76, 244, 0.4);
+
+    pointer-events: none;
+}
+
+.avatar-hint {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.avatar-hint.is-picked {
+    color: var(--brand);
+    font-weight: 700;
+}
+
+/* The name block now sits under the avatar, not beside it */
+
+.profile-avatar-zone .profile-meta {
+    padding-top: 0;
+}
+
+.profile-avatar-zone .profile-meta h2 {
+    font-size: clamp(1.15rem, 3vw, 1.45rem);
+}
+
+
 .file-field {
     position: relative;
 }
@@ -2686,8 +2858,26 @@ select.is-hidden {
         font-size: 1.6rem;
     }
 
+    .profile-avatar-zone {
+        margin-top: -42px;
+    }
+
+    .profile-avatar-zone .profile-avatar {
+        width: 96px;
+        height: 96px;
+
+        font-size: 2rem;
+    }
+
+    .avatar-badge {
+        width: 30px;
+        height: 30px;
+
+        font-size: 0.72rem;
+    }
+
     .profile-meta {
-        padding-top: 38px;
+        padding-top: 0;
     }
 }
 

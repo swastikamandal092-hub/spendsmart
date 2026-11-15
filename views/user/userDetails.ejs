@@ -5,48 +5,79 @@ const initial = (user.name || user.username || "?")
     .trim()
     .charAt(0)
     .toUpperCase();
+
+const hasPhoto = Boolean(user.profileImage);
 %>
 
 <div class="profile-wrapper">
 
     <div class="profile-card">
 
-        <div class="profile-cover"></div>
-
-        <div class="profile-head">
-
-            <% if (user.profileImage) { %>
-
-                <div class="profile-avatar">
-                    <img
-                        src="/uploads/<%= user.profileImage %>"
-                        alt="Profile photo of <%= user.name %>">
-                </div>
-
-            <% } else { %>
-
-                <div class="profile-avatar">
-                    <%= initial %>
-                </div>
-
-            <% } %>
-
-            <div class="profile-meta">
-
-                <h2><%= user.name %></h2>
-
-                <span>@<%= user.username %></span>
-
-            </div>
-
-        </div>
-
-
         <form
             action="/userdetail/change"
             method="POST"
             enctype="multipart/form-data"
             data-success="saved">
+
+            <div class="profile-cover"></div>
+
+
+            <!-- Instagram / Facebook style photo picker -->
+
+            <div class="profile-avatar-zone">
+
+                <input
+                    type="file"
+                    id="profileImage"
+                    name="profileImage"
+                    class="avatar-input"
+                    accept="image/png,image/jpeg,image/webp,image/gif">
+
+                <label class="avatar-uploader" for="profileImage">
+
+                    <span class="profile-avatar" id="avatarPreview">
+
+                        <% if (hasPhoto) { %>
+
+                            <img
+                                id="avatarImage"
+                                src="/uploads/<%= user.profileImage %>"
+                                alt="Profile photo of <%= user.name %>">
+
+                        <% } else { %>
+
+                            <span class="avatar-initial"><%= initial %></span>
+
+                        <% } %>
+
+                    </span>
+
+                    <span class="avatar-overlay">
+                        <i class="fa-solid fa-camera"></i>
+                        <span>Change</span>
+                    </span>
+
+                    <span class="avatar-badge">
+                        <i class="fa-solid fa-camera"></i>
+                    </span>
+
+                </label>
+
+
+                <div class="profile-meta">
+
+                    <h2><%= user.name %></h2>
+
+                    <span>@<%= user.username %></span>
+
+                </div>
+
+                <p class="avatar-hint" id="avatarHint">
+                    Tap the photo to change it
+                </p>
+
+            </div>
+
 
             <div class="form-grid">
 
@@ -91,33 +122,8 @@ const initial = (user.name || user.username || "?")
 
                 </div>
 
-                <div class="field full">
-
-                    <label for="profileImage">Profile Photo</label>
-
-                    <div class="file-field">
-
-                        <input
-                            type="file"
-                            id="profileImage"
-                            name="profileImage"
-                            accept="image/*">
-
-                        <label class="file-label" for="profileImage">
-
-                            <i class="fa-solid fa-camera"></i>
-
-                            <span id="fileLabel">
-                                Choose a photo (JPG or PNG)
-                            </span>
-
-                        </label>
-
-                    </div>
-
-                </div>
-
             </div>
+
 
             <button type="submit" class="save-btn" data-busy="Saving…">
                 Save Changes
@@ -132,20 +138,89 @@ const initial = (user.name || user.username || "?")
 
 <script>
 
-const fileInput = document.getElementById("profileImage");
-const fileLabel = document.getElementById("fileLabel");
+(function () {
 
-if (fileInput && fileLabel) {
+    var input = document.getElementById("profileImage");
+    var preview = document.getElementById("avatarPreview");
+    var hint = document.getElementById("avatarHint");
 
-    fileInput.addEventListener("change", function () {
+    if (!input || !preview) {
+        return;
+    }
 
-        fileLabel.textContent =
-            this.files && this.files[0]
-                ? this.files[0].name
-                : "Choose a photo (JPG or PNG)";
+    var MAX_BYTES = 5 * 1024 * 1024;
+    var objectUrl = null;
+
+    function notify(message, type) {
+        if (window.SpendSmart && window.SpendSmart.toast) {
+            window.SpendSmart.toast(message, type);
+        }
+    }
+
+    function reset() {
+        input.value = "";
+
+        if (objectUrl) {
+            URL.revokeObjectURL(objectUrl);
+            objectUrl = null;
+        }
+    }
+
+    input.addEventListener("change", function () {
+
+        var file = input.files && input.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        if (file.type.indexOf("image/") !== 0) {
+            notify("Please choose an image file", "error");
+            reset();
+            return;
+        }
+
+        if (file.size > MAX_BYTES) {
+            notify("That photo is larger than 5 MB", "error");
+            reset();
+            return;
+        }
+
+        if (objectUrl) {
+            URL.revokeObjectURL(objectUrl);
+        }
+
+        objectUrl = URL.createObjectURL(file);
+
+        var img = preview.querySelector("img");
+
+        if (!img) {
+            var initial = preview.querySelector(".avatar-initial");
+
+            if (initial) {
+                initial.remove();
+            }
+
+            img = document.createElement("img");
+            img.id = "avatarImage";
+            img.alt = "Selected profile photo";
+
+            preview.appendChild(img);
+        }
+
+        img.src = objectUrl;
+
+        preview.classList.add("has-photo");
+
+        if (hint) {
+            hint.textContent = "New photo ready \u2014 press Save changes to apply";
+            hint.classList.add("is-picked");
+        }
+
+        notify("Photo selected", "success");
 
     });
 
-}
+}());
 
 </script>
