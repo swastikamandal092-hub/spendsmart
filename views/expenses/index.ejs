@@ -39,10 +39,15 @@ const initial = displayName.trim().charAt(0).toUpperCase() || "S";
 
         <h1>
             <span class="hero-avatar">
+                <%# The initial stays behind the photo, so a missing file
+                    falls back to the letter instead of a broken image. %>
+                <span class="hero-initial"><%= initial %></span>
+
                 <% if (user.profileImage) { %>
-                    <img src="/uploads/<%= user.profileImage %>" alt="">
-                <% } else { %>
-                    <%= initial %>
+                    <img
+                        src="/uploads/<%= user.profileImage %>"
+                        alt="Profile photo"
+                        data-avatar>
                 <% } %>
             </span>
 

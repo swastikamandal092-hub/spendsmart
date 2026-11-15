@@ -37,16 +37,18 @@ const hasPhoto = Boolean(user.profileImage);
 
                     <span class="profile-avatar" id="avatarPreview">
 
+                        <%# Initials sit underneath, so a missing photo
+                            degrades to the letter instead of a broken image. %>
+
+                        <span class="avatar-initial"><%= initial %></span>
+
                         <% if (hasPhoto) { %>
 
                             <img
                                 id="avatarImage"
                                 src="/uploads/<%= user.profileImage %>"
-                                alt="Profile photo of <%= user.name %>">
-
-                        <% } else { %>
-
-                            <span class="avatar-initial"><%= initial %></span>
+                                alt="Profile photo of <%= user.name %>"
+                                data-avatar>
 
                         <% } %>
 
@@ -204,6 +206,7 @@ const hasPhoto = Boolean(user.profileImage);
             img = document.createElement("img");
             img.id = "avatarImage";
             img.alt = "Selected profile photo";
+            img.setAttribute("data-avatar", "");
 
             preview.appendChild(img);
         }

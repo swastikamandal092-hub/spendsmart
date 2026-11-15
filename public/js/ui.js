@@ -417,6 +417,34 @@
 
 
     /* =====================================================
+       AVATAR IMAGES
+       Uploads can go missing (ephemeral hosting disk), so a
+       broken photo hides itself and the initial shows instead.
+    ===================================================== */
+
+    function setupAvatarImages() {
+        var images = document.querySelectorAll("img[data-avatar]");
+
+        Array.prototype.forEach.call(images, function (img) {
+            function broken() {
+                img.classList.add("is-broken");
+            }
+
+            function loaded() {
+                img.classList.remove("is-broken");
+            }
+
+            if (img.complete && img.naturalWidth === 0) {
+                broken();
+            }
+
+            img.addEventListener("error", broken);
+            img.addEventListener("load", loaded);
+        });
+    }
+
+
+    /* =====================================================
        FORM SUCCESS FLASH (survives the page reload)
     ===================================================== */
 
@@ -535,6 +563,7 @@
         animateCounters();
         setupReveal();
         setupRipple();
+        setupAvatarImages();
         setupFormFlash();
         setupTilt();
     }
