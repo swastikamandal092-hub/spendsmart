@@ -94,9 +94,15 @@ body::before {
     z-index: 0;
 }
 
-.app-main,
-.app-sidebar,
-.mobile-topbar {
+/*
+ * Keep the app shell above the decorative dot layer.
+ *
+ * IMPORTANT: never set `position` on .app-sidebar or .mobile-topbar
+ * here. The sidebar must stay `position: fixed` (navbar.css) and the
+ * mobile bar `sticky`; forcing `relative` drops them into normal flow,
+ * which pushes the whole page down by one full viewport.
+ */
+.app-main {
     position: relative;
     z-index: 1;
 }
@@ -162,8 +168,32 @@ p {
 ========================================================= */
 
 .app-content {
+    width: 100%;
+    max-width: 1400px;
+
+    margin-left: auto;
+    margin-right: auto;
+
     padding-top: 26px;
     padding-bottom: 56px;
+}
+
+
+/*
+ * Desktop shell: content must sit to the right of the fixed 250px
+ * sidebar. responsive.css forces `width: 100%` on .app-main, which
+ * combined with the sidebar offset overflowed the viewport and clipped
+ * the right-hand side of every page.
+ */
+
+@media (min-width: 769px) {
+    .app-main {
+        margin-left: 250px;
+
+        width: calc(100% - 250px);
+        max-width: calc(100% - 250px);
+        min-width: 0;
+    }
 }
 
 .app-content > * + * {
