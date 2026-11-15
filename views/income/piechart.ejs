@@ -1,135 +1,245 @@
 <% layout("/layout/boilerplate") %>
 
-<div class="analytics-header">
+<%
+const palette = [
+    "#5b4cf4", "#22c55e", "#f59e0b", "#06b6d4", "#ec4899",
+    "#8b5cf6", "#f97316", "#14b8a6", "#e11d48", "#64748b"
+];
 
-    <h2>Income Categories</h2>
+const money = (n) => new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 2
+}).format(Number(n) || 0);
 
-    <select
-        id="chartSelector"
-        class="chart-select"
-    >
-        <option value="bar">
-            📊 Bar Graph
-        </option>
+const totals = {};
 
-        <option value="pie" selected>
-            🥧 Pie Chart
-        </option>
+incomeData.forEach(item => {
+    totals[item.category] = (totals[item.category] || 0) + item.amount;
+});
 
-    </select>
+const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
 
-</div>
+const grandTotal = sorted.reduce((sum, row) => sum + row[1], 0);
 
-<div class="chart-card pie-card">
+const chartData = {
+    labels: sorted.map(row => row[0]),
+    values: sorted.map(row => row[1]),
+    colors: sorted.map((row, index) => palette[index % palette.length])
+};
+%>
 
-    <div class="doughnut-wrapper">
+<div class="page-head">
 
-        <canvas id="incomePie"></canvas>
+    <div>
+
+        <span class="eyebrow">
+            <i class="fa-solid fa-chart-pie"></i>
+            Categories
+        </span>
+
+        <h1>Income Sources</h1>
+
+        <p class="page-sub">
+            Where your money comes from, split by category.
+        </p>
 
     </div>
 
-    <div class="category-summary">
-
-    <p>
-        <strong>Top Category:</strong>
-        <span id="topCategory"></span>
-    </p>
-
-    <p>
-        <strong>Total Categories:</strong>
-        <span id="totalCategories"></span>
-    </p>
+    <a href="/transaction/new" class="btn-cta solid">
+        <i class="fa-solid fa-plus"></i>
+        Add income
+    </a>
 
 </div>
+
+
+<div class="chip-row" style="margin-bottom:18px;">
+
+    <a href="/transaction/income/analytics" class="filter-chip">
+        <i class="fa-solid fa-chart-column"></i>
+        Bar graph
+    </a>
+
+    <a href="/transaction/income/piechart" class="filter-chip is-active">
+        <i class="fa-solid fa-chart-pie"></i>
+        Doughnut
+    </a>
+
 </div>
 
+
+<section class="chart-card" data-reveal="60">
+
+    <% if (sorted.length === 0) { %>
+
+        <div class="empty-state">
+
+            <span class="empty-emoji">💤</span>
+
+            <h4>No income recorded yet</h4>
+
+            <p>
+                Add your first income and this chart will break it down
+                by category for you.
+            </p>
+
+            <a href="/transaction/new" class="btn-cta solid" style="margin-top:16px;">
+                <i class="fa-solid fa-plus"></i>
+                Add income
+            </a>
+
+        </div>
+
+    <% } else { %>
+
+        <div class="donut-layout">
+
+            <div class="donut-shell">
+
+                <canvas id="incomePie"></canvas>
+
+                <div class="donut-center">
+                    <small>Total income</small>
+                    <strong>₹ <%= money(grandTotal) %></strong>
+                </div>
+
+            </div>
+
+
+            <div class="breakdown">
+
+                <% sorted.forEach((row, index) => { %>
+
+                    <%
+                    const percent = grandTotal > 0 ? (row[1] / grandTotal) * 100 : 0;
+                    const color = palette[index % palette.length];
+                    %>
+
+                    <div class="breakdown-row">
+
+                        <div class="breakdown-top">
+
+                            <span class="breakdown-name">
+                                <span
+                                    class="breakdown-dot"
+                                    style="background: <%= color %>;">
+                                </span>
+
+                                <%= row[0] %>
+                            </span>
+
+                            <span class="breakdown-amount">
+                                ₹ <%= money(row[1]) %>
+                                <small style="color:#94a3b8;font-weight:600;">
+                                    <%= percent.toFixed(0) %>%
+                                </small>
+                            </span>
+
+                        </div>
+
+                        <div class="breakdown-track">
+
+                            <div
+                                class="breakdown-fill"
+                                style="--w: <%= percent.toFixed(1) %>%; background: <%= color %>;">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                <% }) %>
+
+            </div>
+
+        </div>
+
+    <% } %>
+
+</section>
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 
-document
-.getElementById("chartSelector")
-.addEventListener("change",function(){
+(function () {
 
-    if(this.value==="bar"){
+    const data = <%- JSON.stringify(chartData) %>;
 
-        window.location.href=
-        "/transaction/income/analytics";
+    const canvas = document.getElementById("incomePie");
+
+    if (!canvas || typeof Chart === "undefined" || !data.labels.length) {
+        return;
     }
 
-});
+    const font = "'Plus Jakarta Sans', system-ui, sans-serif";
 
-const incomeData =
-<%- JSON.stringify(incomeData) %>;
+    const grandTotal = data.values.reduce((sum, value) => sum + value, 0);
 
-const categoryTotals = {};
+    const formatMoney = (value) =>
+        "₹" + new Intl.NumberFormat("en-IN", {
+            maximumFractionDigits: 0
+        }).format(value);
 
-incomeData.forEach(e=>{
+    new Chart(canvas.getContext("2d"), {
 
-    if(!categoryTotals[e.category]){
+        type: "doughnut",
 
-        categoryTotals[e.category]=0;
-    }
+        data: {
 
-    categoryTotals[e.category]+=e.amount;
-});
+            labels: data.labels,
 
-const sortedCategories =
-Object.entries(categoryTotals)
-.sort((a,b)=>b[1]-a[1]);
+            datasets: [{
+                data: data.values,
+                backgroundColor: data.colors,
+                borderWidth: 0,
+                hoverOffset: 8,
+                spacing: 2
+            }]
 
-const topCategory =
-sortedCategories[0]?.[0] || "N/A";
+        },
 
-document.getElementById(
-    "topCategory"
-).innerText = topCategory;
+        options: {
 
-document.getElementById(
-    "totalCategories"
-).innerText =
-Object.keys(categoryTotals).length;
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "70%",
 
-new Chart(
-document.getElementById("incomePie"),
-{
-    type:"doughnut",
+            animation: {
+                animateRotate: true,
+                duration: 900,
+                easing: "easeOutQuart"
+            },
 
-    data:{
+            plugins: {
 
-        labels:
-        Object.keys(categoryTotals),
+                legend: { display: false },
 
-        datasets:[{
+                tooltip: {
+                    backgroundColor: "#0f172a",
+                    padding: 12,
+                    cornerRadius: 10,
+                    displayColors: true,
+                    titleFont: { family: font, size: 12, weight: "700" },
+                    bodyFont: { family: font, size: 12, weight: "600" },
+                    callbacks: {
+                        label: function (item) {
+                            const percent = grandTotal > 0
+                                ? (item.parsed / grandTotal) * 100
+                                : 0;
 
-            data:
-            Object.values(categoryTotals),
+                            return " " + formatMoney(item.parsed) +
+                                " (" + percent.toFixed(0) + "%)";
+                        }
+                    }
+                }
 
-            backgroundColor:[
-                "#22c55e",
-                "#3b82f6",
-                "#06b6d4",
-                "#a855f7",
-                "#f59e0b"
-            ]
-        }]
-    },
-
-    options:{
-
-        responsive:true,
-
-        cutout:"65%",
-
-        plugins:{
-
-            legend:{
-                position:"right"
             }
+
         }
-    }
-});
+
+    });
+
+}());
 
 </script>

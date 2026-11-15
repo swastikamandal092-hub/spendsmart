@@ -1,415 +1,343 @@
 <% layout("/layout/boilerplate") %>
 
 <%
-const months=[
-"January",
-"February",
-"March",
-"April",
-"May",
-"June",
-"July",
-"August",
-"September",
-"October",
-"November",
-"December"
+const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
 ];
+
+const money = (n) => new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 2
+}).format(Number(n) || 0);
+
+const total = values.reduce((sum, value) => sum + value, 0);
+
+const peakIndex = values.length ? values.indexOf(Math.max.apply(null, values)) : 0;
+
+const peakLabel = labels[peakIndex]
+    ? (Array.isArray(labels[peakIndex]) ? labels[peakIndex].join(" ") : labels[peakIndex])
+    : "—";
+
+const peakValue = values[peakIndex] || 0;
+
+const average = values.length ? total / values.length : 0;
+
+const currentYear = new Date().getFullYear();
 %>
 
-<div class="container py-4">
+<div class="page-head">
 
-    <!-- Header -->
+    <div>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+        <span class="eyebrow">
+            <i class="fa-solid fa-arrow-trend-down"></i>
+            Analytics
+        </span>
 
-        <h2 class="fw-bold text-danger mb-0">
+        <h1>Expense Analytics</h1>
 
-            Expense Analytics
+        <p class="page-sub">
+            Spot the weeks where your spending spikes the most.
+        </p>
 
-        </h2>
+    </div>
 
-        <select
-        id="chartSelector"
-        class="form-select shadow-sm"
-        style="width:150px;">
+    <a href="/transaction/new" class="btn-cta solid">
+        <i class="fa-solid fa-plus"></i>
+        Add expense
+    </a>
 
-            <option
-            value="bar"
-            <%= currentChart==="bar" ? "selected":"" %>>
+</div>
 
-                📊 Bar Graph
 
+<div class="chip-row" style="margin-bottom:18px;">
+
+    <a href="/transaction/expense/analytics" class="filter-chip is-active">
+        <i class="fa-solid fa-chart-column"></i>
+        Bar graph
+    </a>
+
+    <a href="/transaction/expense/piechart" class="filter-chip">
+        <i class="fa-solid fa-chart-pie"></i>
+        Doughnut
+    </a>
+
+</div>
+
+
+<form
+    class="analytics-toolbar"
+    method="GET"
+    action="/transaction/expense/analytics"
+    id="filterForm">
+
+    <label class="pill-select" for="filterRange">
+        <i class="fa-solid fa-sliders"></i>
+
+        <select name="filter" id="filterRange">
+
+            <option value="month" <%= filter === "month" ? "selected" : "" %>>
+                By month
             </option>
 
-            <option
-            value="pie"
-            <%= currentChart==="pie" ? "selected":"" %>>
+            <option value="week" <%= filter === "week" ? "selected" : "" %>>
+                By week
+            </option>
 
-                🥧 Pie Chart
-
+            <option value="year" <%= filter === "year" ? "selected" : "" %>>
+                By year
             </option>
 
         </select>
+    </label>
 
+
+    <label class="pill-select" for="weekSelect">
+        <i class="fa-solid fa-calendar-week"></i>
+
+        <select name="week" id="weekSelect">
+
+            <% for (let i = 1; i <= 5; i++) { %>
+
+                <option value="<%= i %>" <%= selectedWeek === i ? "selected" : "" %>>
+                    Week <%= i %>
+                </option>
+
+            <% } %>
+
+        </select>
+    </label>
+
+
+    <label class="pill-select" for="monthSelect">
+        <i class="fa-regular fa-calendar"></i>
+
+        <select name="month" id="monthSelect">
+
+            <% months.forEach((month, index) => { %>
+
+                <option
+                    value="<%= index + 1 %>"
+                    <%= selectedMonth === index + 1 ? "selected" : "" %>>
+
+                    <%= month %>
+
+                </option>
+
+            <% }) %>
+
+        </select>
+    </label>
+
+
+    <label class="pill-select" for="yearSelect">
+        <i class="fa-regular fa-calendar-days"></i>
+
+        <select name="year" id="yearSelect">
+
+            <% for (let y = currentYear; y >= 2000; y--) { %>
+
+                <option value="<%= y %>" <%= selectedYear === y ? "selected" : "" %>>
+                    <%= y %>
+                </option>
+
+            <% } %>
+
+        </select>
+    </label>
+
+
+    <button type="submit" class="btn-cta solid" style="flex:0 0 auto;">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        Apply
+    </button>
+
+</form>
+
+
+<div class="chart-summary">
+
+    <div class="mini-stat">
+        <span>Total</span>
+        <strong>₹ <%= money(total) %></strong>
     </div>
 
-    <!-- Filters -->
-
-    <div class="row g-2 mb-4">
-
-        <!-- Week -->
-
-        <div class="col-md-4">
-
-            <div class="dropdown">
-
-                <button
-                class="btn btn-outline-danger dropdown-toggle"
-                id="weekBtn"
-                data-bs-toggle="dropdown">
-
-                    Week <%= selectedWeek %>
-
-                </button>
-
-                <ul class="dropdown-menu custom-dropdown">
-
-                    <% for(let i=1;i<=5;i++){ %>
-
-                    <li>
-
-                        <a
-                        href="#"
-                        class="dropdown-item week-item"
-                        data-week="<%= i %>">
-
-                            Week <%= i %>
-
-                        </a>
-
-                    </li>
-
-                    <% } %>
-
-                </ul>
-
-            </div>
-
-        </div>
-
-        <!-- Month -->
-
-        <div class="col-md-4">
-
-            <div class="dropdown">
-
-                <button
-                class="btn btn-outline-primary dropdown-toggle"
-                id="monthBtn"
-                data-bs-toggle="dropdown">
-
-                    <%= months[selectedMonth-1] %>
-
-                </button>
-
-                <ul class="dropdown-menu custom-dropdown">
-
-                    <% months.forEach((month,index)=>{ %>
-
-                    <li>
-
-                        <a
-                        href="#"
-                        class="dropdown-item month-item"
-                        data-month="<%= index+1 %>">
-
-                            <%= month %>
-
-                        </a>
-
-                    </li>
-
-                    <% }) %>
-
-                </ul>
-
-            </div>
-
-        </div>
-
-        <!-- Year -->
-
-        <div class="col-md-4">
-
-            <div class="dropdown">
-
-                <button
-                class="btn btn-outline-dark dropdown-toggle"
-                id="yearBtn"
-                data-bs-toggle="dropdown">
-
-                    <%= selectedYear %>
-
-                </button>
-
-                <ul class="dropdown-menu custom-dropdown">
-
-                    <%
-                    const currentYear=
-                    new Date().getFullYear();
-                    %>
-
-                    <% for(let y=currentYear;y>=2000;y--){ %>
-
-                    <li>
-
-                        <a
-                        href="#"
-                        class="dropdown-item year-item"
-                        data-year="<%= y %>">
-
-                            <%= y %>
-
-                        </a>
-
-                    </li>
-
-                    <% } %>
-
-                </ul>
-
-            </div>
-
-        </div>
-
+    <div class="mini-stat">
+        <span>Highest</span>
+        <strong><%= peakLabel %></strong>
     </div>
 
-    <!-- Graph -->
-
-<div class="card shadow border-0 rounded-4">
-
-    <div class="card-body p-4">
-
-        <canvas
-            id="expenseChart"
-            height="110">
-        </canvas>
-
-        <div class="text-center mt-4">
-
-            <small
-                id="showingPeriod"
-                class="text-secondary fw-semibold">
-
-                Showing data for :
-                Week <%= selectedWeek %> •
-                <%= months[selectedMonth-1] %>
-                <%= selectedYear %>
-
-            </small>
-
-        </div>
-
+    <div class="mini-stat">
+        <span>Average</span>
+        <strong>₹ <%= money(average) %></strong>
     </div>
 
 </div>
 
-</div>
+
+<section class="chart-card" data-reveal="60">
+
+    <div class="card-head">
+
+        <div>
+
+            <h3>Expense overview</h3>
+
+            <p class="card-sub">
+                ₹ <%= money(peakValue) %> spent in the heaviest period
+            </p>
+
+        </div>
+
+        <span class="chip chip-brand">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+            INR
+        </span>
+
+    </div>
+
+    <div class="chart-shell">
+        <canvas id="expenseChart"></canvas>
+    </div>
+
+    <p class="graph-period" id="showingPeriod">
+        Showing data for:
+        <% if (filter === "year") { %>
+            <%= selectedYear %>
+        <% } else if (filter === "week") { %>
+            Week <%= selectedWeek %> • <%= months[selectedMonth - 1] %> <%= selectedYear %>
+        <% } else { %>
+            <%= months[selectedMonth - 1] %> <%= selectedYear %>
+        <% } %>
+    </p>
+
+    <% if (total === 0) { %>
+
+        <div class="empty-state" style="margin-top:18px;">
+
+            <span class="empty-emoji">🍃</span>
+
+            <h4>No expenses in this period</h4>
+
+            <p>Nice! Try another month, week or year to compare.</p>
+
+        </div>
+
+    <% } %>
+
+</section>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 
-const showingPeriod =
-document.getElementById("showingPeriod");
+(function () {
 
-const selectedWeek =
-<%= selectedWeek %>;
+    const labels = <%- JSON.stringify(labels) %>;
+    const values = <%- JSON.stringify(values) %>;
 
-const selectedMonth =
-<%= selectedMonth %>;
+    const canvas = document.getElementById("expenseChart");
 
-const selectedYear =
-<%= selectedYear %>;
+    if (!canvas || typeof Chart === "undefined") {
+        return;
+    }
 
-const monthBtn =
-document.getElementById("monthBtn");
+    const ctx = canvas.getContext("2d");
 
-const weekBtn =
-document.getElementById("weekBtn");
+    const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+    gradient.addColorStop(0, "#fb7185");
+    gradient.addColorStop(1, "#e11d48");
 
-const yearBtn =
-document.getElementById("yearBtn");
+    const font = "'Plus Jakarta Sans', system-ui, sans-serif";
 
-function updateShowing(){
+    const formatMoney = (value) =>
+        "₹" + new Intl.NumberFormat("en-IN", {
+            maximumFractionDigits: 0
+        }).format(value);
 
-    showingPeriod.innerHTML =
-    `Showing data for : Week ${selectedWeek} • ${months[selectedMonth-1]} ${selectedYear}`;
+    new Chart(ctx, {
 
-}
+        type: "bar",
 
-document.querySelectorAll(".month-item").forEach(item=>{
+        data: {
 
-    item.addEventListener("click",function(e){
+            labels: labels,
 
-        e.preventDefault();
+            datasets: [{
+                label: "Expense",
+                data: values,
+                backgroundColor: gradient,
+                hoverBackgroundColor: "#be123c",
+                borderRadius: 9,
+                borderSkipped: false,
+                maxBarThickness: 34
+            }]
 
-        const monthNumber=this.dataset.month;
+        },
 
-        window.location.href=
-        `/transaction/expense/analytics?filter=month&year=${selectedYear}&month=${monthNumber}`;
+        options: {
 
-    });
+            responsive: true,
+            maintainAspectRatio: false,
 
-});
-
-document.querySelectorAll(".week-item").forEach(item=>{
-
-    item.addEventListener("click",function(e){
-
-        e.preventDefault();
-
-        const week=this.dataset.week;
-
-        window.location.href=
-        `/transaction/expense/analytics?filter=week&year=${selectedYear}&month=${selectedMonth}&week=${week}`;
-
-    });
-
-});
-
-document.querySelectorAll(".year-item").forEach(item=>{
-
-    item.addEventListener("click",function(e){
-
-        e.preventDefault();
-
-        const year=this.dataset.year;
-
-        window.location.href=
-        `/transaction/expense/analytics?filter=year&year=${year}&month=${selectedMonth}`;
-
-    });
-
-});
-
-const labels =
-<%- JSON.stringify(labels) %>;
-
-const values =
-<%- JSON.stringify(values) %>;
-
-const ctx =
-document.getElementById("expenseChart")
-.getContext("2d");
-
-const gradient =
-ctx.createLinearGradient(0,0,0,400);
-
-// Expense Gradient
-gradient.addColorStop(0,"#FFD6A5");
-gradient.addColorStop(0.5,"#FFB4A2");
-gradient.addColorStop(1,"#CDB4DB");
-
-new Chart(ctx,{
-
-    type:"bar",
-
-    data:{
-
-        labels:labels,
-
-        datasets:[{
-
-            label:"Expense",
-
-            data:values,
-
-            backgroundColor:gradient,
-
-            borderRadius:{
-                topLeft:14,
-                topRight:14,
-                bottomLeft:0,
-                bottomRight:0
+            animation: {
+                duration: 900,
+                easing: "easeOutQuart"
             },
 
-            borderSkipped:"bottom",
+            plugins: {
 
-            barThickness:24,
+                legend: { display: false },
 
-            hoverBackgroundColor:"#F4978E"
-
-        }]
-
-    },
-
-    options:{
-
-        responsive:true,
-
-        animation:{
-            duration:1000
-        },
-
-        plugins:{
-
-            legend:{
-                display:false
-            }
-
-        },
-
-        scales:{
-
-            x:{
-
-                ticks:{
-                    font:{
-                        size:13
+                tooltip: {
+                    backgroundColor: "#0f172a",
+                    padding: 12,
+                    cornerRadius: 10,
+                    displayColors: false,
+                    titleFont: { family: font, size: 12, weight: "700" },
+                    bodyFont: { family: font, size: 12, weight: "600" },
+                    callbacks: {
+                        label: (item) => " Expense: " + formatMoney(item.parsed.y)
                     }
-                },
-
-                grid:{
-                    display:false
                 }
 
             },
 
-            y:{
+            scales: {
 
-                beginAtZero:true,
+                x: {
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: {
+                        color: "#94a3b8",
+                        autoSkip: true,
+                        maxRotation: 0,
+                        font: { family: font, size: 11, weight: "600" }
+                    }
+                },
 
-                grid:{
-                    color:"#ECECEC"
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: "#eef0f8",
+                        drawTicks: false
+                    },
+                    border: { display: false },
+                    ticks: {
+                        color: "#94a3b8",
+                        maxTicksLimit: 5,
+                        font: { family: font, size: 11, weight: "600" },
+                        callback: (value) => formatMoney(value)
+                    }
                 }
 
             }
 
         }
 
-    }
+    });
 
-});
+}());
 
-const chartSelector =
-document.getElementById("chartSelector");
-
-chartSelector.addEventListener("change",function(){
-
-    if(this.value==="pie"){
-
-        window.location.href=
-        "/transaction/expense/piechart";
-
-    }
-    else{
-
-        window.location.href=
-        "/transaction/expense/analytics";
-
-    }
-
-});
 </script>

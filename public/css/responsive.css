@@ -307,3 +307,446 @@ svg {
         padding-right: 8px;
     }
 }
+/* =========================================================
+   FINAL MOBILE WIDTH / IPHONE 16 FIX
+========================================================= */
+
+html {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+body {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+
+/* Main application wrapper */
+
+.app-main {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+
+/* Main content */
+
+.app-content {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* =========================================================
+   IPHONE / SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .app-main {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        overflow: visible;
+    }
+
+
+    .app-content {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+
+        overflow: visible;
+    }
+
+
+    /* Welcome section */
+
+    .welcome-section {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    /* Dashboard summary */
+
+    .dashboard-summary {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+
+        gap: 12px;
+    }
+
+
+    .summary-card {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        overflow: hidden;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    .summary-card h2 {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    /* =====================================================
+       QUICK ACTIONS
+    ===================================================== */
+
+    .quick-actions {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 10px;
+    }
+
+
+    .quick-card {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        padding: 16px 10px;
+
+        overflow: hidden;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    .quick-card span {
+        display: block;
+
+        max-width: 100%;
+
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    /* =====================================================
+       TREND CARD
+    ===================================================== */
+
+    .trend-card {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        padding: 18px !important;
+
+        overflow: hidden;
+    }
+
+
+    .trend-card h3 {
+        max-width: 100%;
+
+        font-size: 1.25rem;
+
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    /*
+     * Charts are sized by their `.chart-shell` wrapper so that
+     * Chart.js keeps the correct aspect ratio on every screen.
+     * Do not force `height: auto` here - it collapses the canvas.
+     */
+
+    .trend-card canvas,
+    #dashboardTrend {
+        display: block;
+
+        max-width: 100% !important;
+    }
+
+
+    /* =====================================================
+       TRANSACTION CARDS
+    ===================================================== */
+
+    .expenses {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        overflow: hidden;
+    }
+
+
+    .expense-header {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        gap: 10px;
+    }
+
+
+    .expense-header > div:first-child {
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+
+
+    .expense-header h4 {
+        max-width: 100%;
+
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    .category {
+        max-width: 100%;
+
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    .amount {
+        flex: 0 1 auto;
+
+        max-width: 45%;
+
+        font-size: 1.15rem;
+
+        overflow-wrap: anywhere;
+        word-break: break-word;
+
+        text-align: right;
+    }
+
+
+    /* =====================================================
+       TRANSACTION FOOTER
+    ===================================================== */
+
+    .expense-footer {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap: 10px;
+    }
+
+
+    .action-buttons {
+        max-width: 100%;
+
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap: 7px;
+    }
+
+
+    .action-buttons form {
+        max-width: 100%;
+    }
+
+
+    .action-buttons .btn {
+        max-width: 100%;
+
+        white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       VIEW ALL TRANSACTIONS
+    ===================================================== */
+
+    .view-all-transactions-card {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        overflow: hidden;
+    }
+
+
+    .view-all-text {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+
+    .view-all-text span,
+    .view-all-text small {
+        max-width: 100%;
+
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    /* =====================================================
+       FORMS / INPUTS
+    ===================================================== */
+
+    input,
+    select,
+    textarea,
+    button,
+    .btn {
+        max-width: 100%;
+    }
+
+
+    /* =====================================================
+       BOOTSTRAP SAFETY
+    ===================================================== */
+
+    .container,
+    .container-fluid,
+    .row {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+
+    .row > * {
+        min-width: 0;
+    }
+
+
+    /* Prevent long content from creating viewport overflow */
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    span,
+    a {
+        overflow-wrap: anywhere;
+    }
+
+}
+
+
+/* =========================================================
+   IPHONE 16 WIDTH
+   ~393px
+========================================================= */
+
+@media (min-width: 390px) and (max-width: 430px) {
+
+    .app-content {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+
+    .summary-card {
+        padding: 20px !important;
+    }
+
+
+    .quick-card {
+        min-height: 80px;
+
+        display: flex;
+        flex-direction: column;
+
+        justify-content: center;
+        align-items: center;
+
+        text-align: center;
+    }
+
+
+    .trend-card {
+        padding: 16px !important;
+    }
+
+
+    .expense-footer {
+        align-items: flex-start;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL DEVICES
+========================================================= */
+
+@media (max-width: 359px) {
+
+    .app-content {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+
+    .expense-header {
+        flex-direction: column;
+    }
+
+
+    .amount {
+        max-width: 100%;
+        text-align: left;
+    }
+
+}

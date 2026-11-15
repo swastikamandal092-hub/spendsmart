@@ -10,45 +10,121 @@
 
         <h2>Add Transaction</h2>
 
-        <form method="POST" action="/transaction">
+        <p class="form-subtitle">
+            Log it in a few taps — your charts update instantly.
+        </p>
 
-            <label for="title">Title</label>
-            <input
-                type="text"
-                name="title"
-                id="title"
-                placeholder="Enter title"
-                required
-            >
+        <form method="POST" action="/transaction" data-success="added">
 
-            <label for="amount">Amount</label>
-            <input
-                type="number"
-                name="amount"
-                id="amount"
-                placeholder="Enter amount"
-                required
-            >
+            <div class="field">
 
-            <label for="type">Transaction Type</label>
-            <select name="type" id="type">
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-            </select>
+                <label>Transaction Type</label>
 
-           <label for="category">Category</label>
-<select name="category" id="category">
-</select>
+                <div class="segmented" data-segmented>
 
-            <label for="date">Date</label>
-            <input
-                type="date"
-                name="date"
-                id="date"
-                required
-            >
+                    <button
+                        type="button"
+                        class="seg-btn is-active"
+                        data-value="income">
 
-            <button class="save-btn">
+                        💸 Income
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="seg-btn"
+                        data-value="expense">
+
+                        🧾 Expense
+
+                    </button>
+
+                </div>
+
+                <select
+                    name="type"
+                    id="type"
+                    class="is-hidden"
+                    tabindex="-1"
+                    aria-hidden="true">
+
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="title">Title</label>
+
+                <input
+                    type="text"
+                    name="title"
+                    id="title"
+                    placeholder="e.g. Lunch with the team"
+                    required>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="amount">Amount</label>
+
+                <div class="input-group-money">
+
+                    <span class="currency">₹</span>
+
+                    <input
+                        type="number"
+                        name="amount"
+                        id="amount"
+                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                        required>
+
+                </div>
+
+                <div class="amount-chips">
+
+                    <button type="button" class="amount-chip" data-amount="100">+100</button>
+                    <button type="button" class="amount-chip" data-amount="500">+500</button>
+                    <button type="button" class="amount-chip" data-amount="1000">+1,000</button>
+                    <button type="button" class="amount-chip" data-amount="5000">+5,000</button>
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="category">Category</label>
+
+                <select name="category" id="category"></select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="date">Date</label>
+
+                <input
+                    type="date"
+                    name="date"
+                    id="date"
+                    required>
+
+            </div>
+
+
+            <button type="submit" class="save-btn" data-busy="Adding…">
                 Add Transaction
             </button>
 
@@ -58,112 +134,109 @@
 
 </div>
 
+
 <script>
 
 const incomeCategories = [
-"Salary",
-"Freelancing",
-"Business",
-"Investment",
-"Bonus",
-"Gift Received",
-"Rental Income",
-"Refund",
-"Cashback",
-"Other Income"
+    "Salary",
+    "Freelancing",
+    "Business",
+    "Investment",
+    "Bonus",
+    "Gift Received",
+    "Rental Income",
+    "Refund",
+    "Cashback",
+    "Other Income"
 ];
 
 const expenseCategories = [
-"Food",
-"Groceries",
-"Rent",
-"Electricity",
-"Water Bill",
-"Gas Bill",
-"Internet",
-"Mobile Recharge",
-"Transportation",
-"Fuel",
-"Shopping",
-"Clothing",
-"Healthcare",
-"Medicine",
-"Education",
-"Entertainment",
-"Travel",
-"Subscription",
-"EMI / Loan",
-"Personal Care",
-"Pets",
-"Charity",
-"Family",
-"Maintenance",
-"Gifts",
-"Other Expense"
+    "Food",
+    "Groceries",
+    "Rent",
+    "Electricity",
+    "Water Bill",
+    "Gas Bill",
+    "Internet",
+    "Mobile Recharge",
+    "Transportation",
+    "Fuel",
+    "Shopping",
+    "Clothing",
+    "Healthcare",
+    "Medicine",
+    "Education",
+    "Entertainment",
+    "Travel",
+    "Subscription",
+    "EMI / Loan",
+    "Personal Care",
+    "Pets",
+    "Charity",
+    "Family",
+    "Maintenance",
+    "Gifts",
+    "Other Expense"
 ];
 
 const emojiMap = {
+    Salary: "💼",
+    Freelancing: "💻",
+    Business: "🏢",
+    Investment: "📈",
+    Bonus: "💰",
+    "Gift Received": "🎁",
+    "Rental Income": "🏠",
+    Refund: "💸",
+    Cashback: "💳",
+    "Other Income": "💵",
 
-Salary:"💼",
-Freelancing:"💻",
-Business:"🏢",
-Investment:"📈",
-Bonus:"💰",
-"Gift Received":"🎁",
-"Rental Income":"🏠",
-Refund:"💸",
-Cashback:"💳",
-"Other Income":"💵",
-
-Food:"🍔",
-Groceries:"🛒",
-Rent:"🏠",
-Electricity:"⚡",
-"Water Bill":"💧",
-"Gas Bill":"🔥",
-Internet:"📶",
-"Mobile Recharge":"📱",
-Transportation:"🚕",
-Fuel:"⛽",
-Shopping:"🛍",
-Clothing:"👕",
-Healthcare:"🏥",
-Medicine:"💊",
-Education:"🎓",
-Entertainment:"🎬",
-Travel:"✈️",
-Subscription:"📺",
-"EMI / Loan":"💳",
-"Personal Care":"🧴",
-Pets:"🐶",
-Charity:"❤️",
-Family:"👨‍👩‍👧",
-Maintenance:"🔧",
-Gifts:"🎁",
-"Other Expense":"📦"
-
+    Food: "🍔",
+    Groceries: "🛒",
+    Rent: "🏠",
+    Electricity: "⚡",
+    "Water Bill": "💧",
+    "Gas Bill": "🔥",
+    Internet: "📶",
+    "Mobile Recharge": "📱",
+    Transportation: "🚕",
+    Fuel: "⛽",
+    Shopping: "🛍️",
+    Clothing: "👕",
+    Healthcare: "🏥",
+    Medicine: "💊",
+    Education: "🎓",
+    Entertainment: "🎬",
+    Travel: "✈️",
+    Subscription: "📺",
+    "EMI / Loan": "💳",
+    "Personal Care": "🧴",
+    Pets: "🐶",
+    Charity: "❤️",
+    Family: "👨‍👩‍👧",
+    Maintenance: "🔧",
+    Gifts: "🎁",
+    "Other Expense": "📦"
 };
 
 const typeSelect = document.getElementById("type");
 const categorySelect = document.getElementById("category");
+const segButtons = document.querySelectorAll(".seg-btn");
 
-function loadCategories(){
+function loadCategories() {
 
-    categorySelect.innerHTML="";
+    categorySelect.innerHTML = "";
 
-    const list =
-    typeSelect.value==="income"
-    ? incomeCategories
-    : expenseCategories;
+    const list = typeSelect.value === "income"
+        ? incomeCategories
+        : expenseCategories;
 
-    list.forEach(item=>{
+    list.forEach(item => {
 
-        const option=document.createElement("option");
+        const option = document.createElement("option");
 
-        option.value=item;          
-
-        option.textContent=
-        `${emojiMap[item]} ${item}`;
+        option.value = item;
+        option.textContent = `${emojiMap[item] || "•"} ${item}`;
 
         categorySelect.appendChild(option);
 
@@ -171,15 +244,79 @@ function loadCategories(){
 
 }
 
+function syncSegmented() {
+
+    segButtons.forEach(button => {
+
+        button.classList.toggle(
+            "is-active",
+            button.dataset.value === typeSelect.value
+        );
+
+    });
+
+}
+
+segButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        typeSelect.value = button.dataset.value;
+
+        syncSegmented();
+        loadCategories();
+
+    });
+
+});
+
+typeSelect.addEventListener("change", () => {
+
+    syncSegmented();
+    loadCategories();
+
+});
+
+/* Preselect the type when arriving from a dashboard quick action
+   (e.g. /transaction/new?type=expense) */
+
+const requestedType = new URLSearchParams(window.location.search).get("type");
+
+if (requestedType === "income" || requestedType === "expense") {
+    typeSelect.value = requestedType;
+}
+
 loadCategories();
+syncSegmented();
 
-typeSelect.addEventListener(
-"change",
-loadCategories
-);
-// Restrict future dates
 
-document.getElementById("date").max =
-new Date().toISOString().split("T")[0];
+/* Quick amount helpers */
+
+document.querySelectorAll(".amount-chip").forEach(chip => {
+
+    chip.addEventListener("click", () => {
+
+        const amountInput = document.getElementById("amount");
+
+        const current = Number(amountInput.value) || 0;
+
+        amountInput.value = current + Number(chip.dataset.amount);
+
+        amountInput.focus();
+
+    });
+
+});
+
+
+/* Default to today + block future dates */
+
+const dateInput = document.getElementById("date");
+
+dateInput.max = new Date().toISOString().split("T")[0];
+
+if (!dateInput.value) {
+    dateInput.value = dateInput.max;
+}
 
 </script>

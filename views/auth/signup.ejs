@@ -2,89 +2,137 @@
 
 <div class="auth-page">
 
-<div class="profile-wrapper">
+    <div class="profile-wrapper">
 
-    <div class="auth-card">
+        <a href="/login" class="auth-brand">
+            <span class="brand-icon">
+                <i class="fa-solid fa-wallet"></i>
+            </span>
+            SpendSmart
+        </a>
 
-        <div class="auth-icon">
-            👤
-        </div>
+        <div class="auth-card">
 
-        <h2>Create Account</h2>
+            <div class="auth-icon">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
 
-        <p class="auth-subtitle">
-            Join SpendSmart and start tracking your finances
-        </p>
+            <h2>Create Account</h2>
 
-        <form method="POST" action="/signup">
+            <p class="auth-subtitle">
+                Join SpendSmart and start tracking your finances
+            </p>
 
-            <label for="username">Username</label>
-            <input
-                type="text"
-                name="username"
-                id="username"
-                placeholder="Enter Username"
-                required
-            >
+            <form method="POST" action="/signup">
 
-            <label for="name">Full Name</label>
-            <input
-                type="text"
-                name="name"
-                id="name"
-                placeholder="Enter Your Name"
-                required
-            >
+                <div class="form-grid">
 
-            <label for="age">Age</label>
-            <input
-                type="number"
-                name="age"
-                id="age"
-                placeholder="Enter Your Age"
-                required
-            >
+                    <div class="field">
 
-            <label for="balance">Opening Balance</label>
-            <input
-                type="number"
-                name="balance"
-                id="balance"
-                placeholder="Enter Opening Balance"
-                required
-            >
+                        <label for="username">Username</label>
 
-            <label for="email">Email</label>
-            <input
-                type="email"
-                name="email"
-                id="email"
-                placeholder="Enter Your Email"
-                required
-            >
+                        <input
+                            type="text"
+                            name="username"
+                            id="username"
+                            placeholder="Enter username"
+                            autocomplete="username"
+                            required>
 
-            <label for="password">Password</label>
-            <input
-                type="password"
-                name="password"
-                id="password"
-                placeholder="Create Password"
-                required
-            >
+                    </div>
 
-            <button type="submit" class="save-btn">
-                Create Account
-            </button>
+                    <div class="field">
 
-        </form>
+                        <label for="name">Full Name</label>
 
-        <div class="auth-footer">
-            Already have an account?
-            <a href="/login">Login</a>
+                        <input
+                            type="text"
+                            name="name"
+                            id="name"
+                            placeholder="Enter your name"
+                            autocomplete="name"
+                            required>
+
+                    </div>
+
+                    <div class="field">
+
+                        <label for="age">Age</label>
+
+                        <input
+                            type="number"
+                            name="age"
+                            id="age"
+                            placeholder="Age"
+                            min="1"
+                            max="120"
+                            required>
+
+                    </div>
+
+                    <div class="field">
+
+                        <label for="balance">Opening Balance</label>
+
+                        <div class="input-group-money">
+
+                            <span class="currency">₹</span>
+
+                            <input
+                                type="number"
+                                name="balance"
+                                id="balance"
+                                placeholder="0.00"
+                                step="0.01"
+                                required>
+
+                        </div>
+
+                    </div>
+
+                    <div class="field full">
+
+                        <label for="email">Email</label>
+
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            placeholder="you@example.com"
+                            autocomplete="email"
+                            required>
+
+                    </div>
+
+                    <div class="field full">
+
+                        <label for="password">Password</label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            placeholder="Create a password"
+                            autocomplete="new-password"
+                            required>
+
+                    </div>
+
+                </div>
+
+                <button type="submit" class="save-btn" data-busy="Creating…">
+                    Create Account
+                </button>
+
+            </form>
+
+            <div class="auth-footer">
+                Already have an account?
+                <a href="/login">Login</a>
+            </div>
+
         </div>
 
     </div>
-
-</div>
 
 </div>

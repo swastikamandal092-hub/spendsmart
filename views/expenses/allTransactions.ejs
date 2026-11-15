@@ -1,57 +1,259 @@
 <% layout("/layout/boilerplate") %>
 
-<h2 class="mb-4">All Transactions</h2>
+<%
+const fmtDate = (d) => new Date(d).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+});
 
-<% for(let e of allexpenses){ %>
+const incomeCount = allexpenses.filter(e => e.type === "income").length;
+const expenseCount = allexpenses.filter(e => e.type === "expense").length;
 
-<div class="expenses">
+const money = (n) => new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 2
+}).format(Number(n) || 0);
+%>
 
-    <div class="expense-header">
+<div class="page-head">
 
-        <div>
-            <h4><%= e.title %></h4>
+    <div>
 
-            <p class="category">
-                <%= e.category %> • <%= e.type %>
-            </p>
-        </div>
-
-        <div class="amount <%= e.type %>">
-            ₹<%= e.amount %>
-        </div>
-
-    </div>
-
-    <div class="expense-footer">
-
-        <span>
-            <%= e.date.toString().split(" ").slice(0,4).join(" ") %>
+        <span class="eyebrow">
+            <i class="fa-solid fa-list"></i>
+            History
         </span>
 
-        <div class="action-buttons">
+        <h1>All Transactions</h1>
 
-            <form method="get"
-                  action="/transaction/<%= e._id %>/edit">
-
-                <button class="btn btn-primary">
-                    Edit
-                </button>
-
-            </form>
-
-            <form method="post"
-                  action="/transaction/<%= e._id %>?_method=DELETE">
-
-                <button class="btn btn-danger">
-                    Delete
-                </button>
-
-            </form>
-
-        </div>
+        <p class="page-sub">
+            <%= allexpenses.length %> record<%= allexpenses.length === 1 ? "" : "s" %>
+            saved in your account
+        </p>
 
     </div>
+
+    <a href="/transaction/new" class="btn-cta solid">
+        <i class="fa-solid fa-plus"></i>
+        Add Transaction
+    </a>
 
 </div>
 
-<% } %>
+
+<div class="txn-toolbar">
+
+    <div class="chip-row" id="txnFilters">
+
+        <button type="button" class="filter-chip is-active" data-filter="all">
+            All
+            <span class="chip-count"><%= allexpenses.length %></span>
+        </button>
+
+        <button type="button" class="filter-chip" data-filter="income">
+            Income
+            <span class="chip-count"><%= incomeCount %></span>
+        </button>
+
+        <button type="button" class="filter-chip" data-filter="expense">
+            Expense
+            <span class="chip-count"><%= expenseCount %></span>
+        </button>
+
+    </div>
+
+
+    <label class="txn-search" for="txnSearch">
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <input
+            type="search"
+            id="txnSearch"
+            placeholder="Search title or category"
+            autocomplete="off">
+    </label>
+
+</div>
+
+
+<div id="txnList">
+
+    <% if (allexpenses.length === 0) { %>
+
+        <div class="empty-state">
+
+            <span class="empty-emoji">🌱</span>
+
+            <h4>No transactions yet</h4>
+
+            <p>
+                Add your first income or expense and SpendSmart will start
+                charting your money for you.
+            </p>
+
+            <a href="/transaction/new" class="btn-cta solid" style="margin-top:16px;">
+                <i class="fa-solid fa-plus"></i>
+                Add your first one
+            </a>
+
+        </div>
+
+    <% } %>
+
+
+    <% for (let e of allexpenses) { %>
+
+        <article
+            class="expenses"
+            data-txn
+            data-type="<%= e.type %>"
+            data-category="<%= e.category %>"
+            data-title="<%= e.title %>"
+            data-reveal>
+
+            <div class="txn-row">
+
+                <div class="txn-icon">
+                    <span class="txn-emoji">🧾</span>
+                </div>
+
+                <div class="txn-body">
+
+                    <h4><%= e.title %></h4>
+
+                    <p class="category">
+                        <%= e.category %> • <%= e.type %>
+                    </p>
+
+                </div>
+
+                <div class="amount <%= e.type %>">
+                    <%= e.type === "income" ? "+" : "−" %>₹<%= money(e.amount) %>
+                </div>
+
+            </div>
+
+            <div class="expense-footer">
+
+                <span class="txn-date">
+                    <i class="fa-regular fa-calendar"></i>
+                    <%= fmtDate(e.date) %>
+                </span>
+
+                <div class="action-buttons">
+
+                    <form method="get" action="/transaction/<%= e._id %>/edit">
+                        <button type="submit" class="btn btn-primary">
+                            Edit
+                        </button>
+                    </form>
+
+                    <form
+                        method="post"
+                        action="/transaction/<%= e._id %>?_method=DELETE"
+                        data-success="deleted">
+
+                        <button type="submit" class="btn btn-danger">
+                            Delete
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </article>
+
+    <% } %>
+
+</div>
+
+
+<div class="empty-state" id="txnEmpty" hidden>
+
+    <span class="empty-emoji">🔍</span>
+
+    <h4>Nothing matches that</h4>
+
+    <p>Try a different filter or search term.</p>
+
+</div>
+
+
+<script>
+
+(function () {
+
+    var list = document.getElementById("txnList");
+    var empty = document.getElementById("txnEmpty");
+    var search = document.getElementById("txnSearch");
+    var chips = document.querySelectorAll("#txnFilters .filter-chip");
+
+    if (!list) {
+        return;
+    }
+
+    var cards = list.querySelectorAll("[data-txn]");
+    var activeFilter = "all";
+
+    function apply() {
+
+        var term = (search ? search.value : "").trim().toLowerCase();
+        var visible = 0;
+
+        cards.forEach(function (card) {
+
+            var type = card.getAttribute("data-type");
+            var title = (card.getAttribute("data-title") || "").toLowerCase();
+            var category = (card.getAttribute("data-category") || "").toLowerCase();
+
+            var matchesFilter =
+                activeFilter === "all" || type === activeFilter;
+
+            var matchesTerm =
+                !term ||
+                title.indexOf(term) !== -1 ||
+                category.indexOf(term) !== -1;
+
+            var show = matchesFilter && matchesTerm;
+
+            card.hidden = !show;
+
+            if (show) {
+                visible += 1;
+            }
+
+        });
+
+        if (empty) {
+            empty.hidden = visible !== 0 || cards.length === 0;
+        }
+
+    }
+
+    chips.forEach(function (chip) {
+
+        chip.addEventListener("click", function () {
+
+            chips.forEach(function (other) {
+                other.classList.remove("is-active");
+            });
+
+            chip.classList.add("is-active");
+
+            activeFilter = chip.getAttribute("data-filter");
+
+            apply();
+
+        });
+
+    });
+
+    if (search) {
+        search.addEventListener("input", apply);
+    }
+
+}());
+
+</script>

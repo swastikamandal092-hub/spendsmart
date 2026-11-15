@@ -35,11 +35,11 @@ body{
     font-family:'Plus Jakarta Sans',sans-serif;
 }
 
-.container{
-     max-width:1100px;
-    margin:40px auto;
-    padding:0 20px;
-}
+/*
+ * NOTE: the global `.container` override that used to live here
+ * was removed on purpose. It clashed with Bootstrap's `.container`
+ * and caused doubled padding/margins on the analytics pages.
+ */
 h2{
     font-weight:700;
     margin-bottom:25px;
@@ -547,11 +547,7 @@ hr{
     object-fit:cover;
 
     display:block;
-
 }
-
-    box-shadow:
-    0 10px 25px rgba(124,58,237,.35);
 
 .profile-card input{
 

@@ -1,36 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+<% layout("/layout/boilerplate") %>
 
-    line graph for income
+<div class="page-head">
 
-    <select id="graphType">
-        <option value="">Select</option>
-        <option value="/transaction/income/piechart">
-            Pie Chart
-        </option>
-        <option value="/transaction/income/linegraph">
-            Line Graph
-        </option>
-    </select>
+    <div>
 
-    <script>
-        document
-        .getElementById("graphType")
-        .addEventListener("change", function () {
+        <span class="eyebrow">
+            <i class="fa-solid fa-chart-line"></i>
+            Graphs
+        </span>
 
-            const selectedPage = this.value;
+        <h1>Income Graphs</h1>
 
-            if(selectedPage){
-                window.location.href = selectedPage;
-            }
-        });
-    </script>
+        <p class="page-sub">
+            Choose the chart that shows your income best.
+        </p>
 
-</body>
-</html>
+    </div>
+
+    <a href="/transaction/new" class="btn-cta solid">
+        <i class="fa-solid fa-plus"></i>
+        Add income
+    </a>
+
+</div>
+
+
+<section class="chart-card">
+
+    <div class="card-head">
+
+        <div>
+
+            <h3>Pick a chart style</h3>
+
+            <p class="card-sub">
+                Both views use your live transaction data.
+            </p>
+
+        </div>
+
+        <span class="chip chip-brand">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+            INR
+        </span>
+
+    </div>
+
+
+    <div class="quick-actions" style="margin-bottom:0;">
+
+        <a href="/transaction/income/analytics" class="quick-card quick-income">
+            <i class="fa-solid fa-chart-column"></i>
+            <span>Bar graph</span>
+            <small>Period by period</small>
+        </a>
+
+        <a href="/transaction/income/piechart" class="quick-card quick-add">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Doughnut</span>
+            <small>By category</small>
+        </a>
+
+    </div>
+
+</section>

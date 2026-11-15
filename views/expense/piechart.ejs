@@ -1,130 +1,245 @@
 <% layout("/layout/boilerplate") %>
 
-<div class="analytics-header">
+<%
+const palette = [
+    "#5b4cf4", "#22c55e", "#f59e0b", "#06b6d4", "#ec4899",
+    "#8b5cf6", "#f97316", "#14b8a6", "#e11d48", "#64748b"
+];
 
-    <h2>Expense Categories</h2>
+const money = (n) => new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 2
+}).format(Number(n) || 0);
 
-    <select
-        id="chartSelector"
-        class="chart-select"
-    >
+const totals = {};
 
-        <option value="bar">
-            📊 Bar Graph
-        </option>
+expenseData.forEach(item => {
+    totals[item.category] = (totals[item.category] || 0) + item.amount;
+});
 
-        <option value="pie" selected>
-            🥧 Pie Chart
-        </option>
+const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
 
-    </select>
+const grandTotal = sorted.reduce((sum, row) => sum + row[1], 0);
 
-</div>
+const chartData = {
+    labels: sorted.map(row => row[0]),
+    values: sorted.map(row => row[1]),
+    colors: sorted.map((row, index) => palette[index % palette.length])
+};
+%>
 
-<div class="chart-card pie-card">
+<div class="page-head">
 
-    <div class="doughnut-wrapper">
+    <div>
 
-        <canvas id="expensePie"></canvas>
+        <span class="eyebrow">
+            <i class="fa-solid fa-chart-pie"></i>
+            Categories
+        </span>
+
+        <h1>Expense Breakdown</h1>
+
+        <p class="page-sub">
+            The categories eating the biggest slice of your budget.
+        </p>
 
     </div>
 
-    <div class="category-summary">
-
-        <p>
-            <strong>Top Category:</strong>
-            Investment
-        </p>
-
-        <p>
-            <strong>Total Categories:</strong>
-            4
-        </p>
-
-    </div>
+    <a href="/transaction/new" class="btn-cta solid">
+        <i class="fa-solid fa-plus"></i>
+        Add expense
+    </a>
 
 </div>
+
+
+<div class="chip-row" style="margin-bottom:18px;">
+
+    <a href="/transaction/expense/analytics" class="filter-chip">
+        <i class="fa-solid fa-chart-column"></i>
+        Bar graph
+    </a>
+
+    <a href="/transaction/expense/piechart" class="filter-chip is-active">
+        <i class="fa-solid fa-chart-pie"></i>
+        Doughnut
+    </a>
+
+</div>
+
+
+<section class="chart-card" data-reveal="60">
+
+    <% if (sorted.length === 0) { %>
+
+        <div class="empty-state">
+
+            <span class="empty-emoji">🌱</span>
+
+            <h4>No expenses recorded yet</h4>
+
+            <p>
+                Add an expense and this chart will show exactly where
+                your money goes.
+            </p>
+
+            <a href="/transaction/new" class="btn-cta solid" style="margin-top:16px;">
+                <i class="fa-solid fa-plus"></i>
+                Add expense
+            </a>
+
+        </div>
+
+    <% } else { %>
+
+        <div class="donut-layout">
+
+            <div class="donut-shell">
+
+                <canvas id="expensePie"></canvas>
+
+                <div class="donut-center">
+                    <small>Total spend</small>
+                    <strong>₹ <%= money(grandTotal) %></strong>
+                </div>
+
+            </div>
+
+
+            <div class="breakdown">
+
+                <% sorted.forEach((row, index) => { %>
+
+                    <%
+                    const percent = grandTotal > 0 ? (row[1] / grandTotal) * 100 : 0;
+                    const color = palette[index % palette.length];
+                    %>
+
+                    <div class="breakdown-row">
+
+                        <div class="breakdown-top">
+
+                            <span class="breakdown-name">
+                                <span
+                                    class="breakdown-dot"
+                                    style="background: <%= color %>;">
+                                </span>
+
+                                <%= row[0] %>
+                            </span>
+
+                            <span class="breakdown-amount">
+                                ₹ <%= money(row[1]) %>
+                                <small style="color:#94a3b8;font-weight:600;">
+                                    <%= percent.toFixed(0) %>%
+                                </small>
+                            </span>
+
+                        </div>
+
+                        <div class="breakdown-track">
+
+                            <div
+                                class="breakdown-fill"
+                                style="--w: <%= percent.toFixed(1) %>%; background: <%= color %>;">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                <% }) %>
+
+            </div>
+
+        </div>
+
+    <% } %>
+
+</section>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 
-document
-.getElementById("chartSelector")
-.addEventListener("change",function(){
+(function () {
 
-    if(this.value==="bar"){
+    const data = <%- JSON.stringify(chartData) %>;
 
-        window.location.href=
-        "/transaction/expense/analytics";
+    const canvas = document.getElementById("expensePie");
+
+    if (!canvas || typeof Chart === "undefined" || !data.labels.length) {
+        return;
     }
 
-});
+    const font = "'Plus Jakarta Sans', system-ui, sans-serif";
 
-const expenseData =
-<%- JSON.stringify(expenseData) %>;
+    const grandTotal = data.values.reduce((sum, value) => sum + value, 0);
 
-const categoryTotals = {};
+    const formatMoney = (value) =>
+        "₹" + new Intl.NumberFormat("en-IN", {
+            maximumFractionDigits: 0
+        }).format(value);
 
-expenseData.forEach(e=>{
+    new Chart(canvas.getContext("2d"), {
 
-    if(!categoryTotals[e.category]){
+        type: "doughnut",
 
-        categoryTotals[e.category]=0;
-    }
+        data: {
 
-    categoryTotals[e.category]+=e.amount;
-});
+            labels: data.labels,
 
-new Chart(
-document.getElementById("expensePie"),
-{
-    type:"doughnut",
+            datasets: [{
+                data: data.values,
+                backgroundColor: data.colors,
+                borderWidth: 0,
+                hoverOffset: 8,
+                spacing: 2
+            }]
 
-    data:{
+        },
 
-        labels:
-        Object.keys(categoryTotals),
+        options: {
 
-        datasets:[{
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "70%",
 
-            data:
-            Object.values(categoryTotals),
+            animation: {
+                animateRotate: true,
+                duration: 900,
+                easing: "easeOutQuart"
+            },
 
-            backgroundColor:[
-                "#ff6384",
-                "#ff9f40",
-                "#36a2eb",
-                "#4bc0c0",
-                "#9966ff"
-            ]
-        }]
-    },
+            plugins: {
 
-    options:{
+                legend: { display: false },
 
-    responsive:true,
+                tooltip: {
+                    backgroundColor: "#0f172a",
+                    padding: 12,
+                    cornerRadius: 10,
+                    displayColors: true,
+                    titleFont: { family: font, size: 12, weight: "700" },
+                    bodyFont: { family: font, size: 12, weight: "600" },
+                    callbacks: {
+                        label: function (item) {
+                            const percent = grandTotal > 0
+                                ? (item.parsed / grandTotal) * 100
+                                : 0;
 
-    cutout:"65%",
-
-    plugins:{
-
-        legend:{
-
-            position:"right",
-
-            labels:{
-
-                color:"#475569",
-
-                font:{
-                    size:14,
-                    weight:"600"
+                            return " " + formatMoney(item.parsed) +
+                                " (" + percent.toFixed(0) + "%)";
+                        }
+                    }
                 }
+
             }
+
         }
-    }
-}
-});
+
+    });
+
+}());
 
 </script>

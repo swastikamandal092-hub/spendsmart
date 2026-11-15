@@ -1,30 +1,306 @@
 <% layout("/layout/boilerplate") %>
-<body>
-     <form  method="POST" action="/transaction/<%= exp._id %>?_method=PUT">
-        <label for="title">Title:</label>
-        <input type="text" value="<%= exp.title %>" name="title" id="title">
-        <br>
-        <label for="amount">Amount:</label>
-        <input type="number" value="<%= exp.amount %>" name="amount" id="">
-        <br>
-        <label for="type">Choose type:</label>
-        <select name="type">
-  <option value="income" <%= exp.type === "income" ? "selected" : "" %>>Income</option>
-  <option value="expense" <%= exp.type === "expense" ? "selected" : "" %>>Expense</option>
-</select>
-        <br>
-        <label for="category">Choose category:</label>
-        <select name="category">
-  <option value="food" <%= exp.category==="food"?"selected":"" %>>Food</option>
-  <option value="rent" <%= exp.category==="rent"?"selected":"" %>>Rent</option>
-  <option value="salary" <%= exp.category==="salary"?"selected":"" %>>Salary</option>
-  <option value="investment" <%= exp.category==="investment"?"selected":"" %>>Investment</option>
-</select>
-        <br>
-        <label for="date">Date</label>
-        <input type="date" name="date" value="<%= exp.date.toISOString().split('T')[0] %>" id="">
-        <br>
-        <button>Submit</button>
-    </form>
-</body>
-</html>
+
+<div class="profile-wrapper">
+
+    <div class="transaction-card">
+
+        <div class="transaction-icon">
+            ✏️
+        </div>
+
+        <h2>Edit Transaction</h2>
+
+        <p class="form-subtitle">
+            Changed your mind? Fix the details and save.
+        </p>
+
+        <form
+            method="POST"
+            action="/transaction/<%= exp._id %>?_method=PUT"
+            data-success="updated">
+
+            <div class="field">
+
+                <label>Transaction Type</label>
+
+                <div class="segmented" data-segmented>
+
+                    <button
+                        type="button"
+                        class="seg-btn"
+                        data-value="income">
+
+                        💸 Income
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="seg-btn"
+                        data-value="expense">
+
+                        🧾 Expense
+
+                    </button>
+
+                </div>
+
+                <select
+                    name="type"
+                    id="type"
+                    class="is-hidden"
+                    tabindex="-1"
+                    aria-hidden="true">
+
+                    <option
+                        value="income"
+                        <%= exp.type === "income" ? "selected" : "" %>>
+
+                        Income
+
+                    </option>
+
+                    <option
+                        value="expense"
+                        <%= exp.type === "expense" ? "selected" : "" %>>
+
+                        Expense
+
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="title">Title</label>
+
+                <input
+                    type="text"
+                    name="title"
+                    id="title"
+                    value="<%= exp.title %>"
+                    placeholder="Enter title"
+                    required>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="amount">Amount</label>
+
+                <div class="input-group-money">
+
+                    <span class="currency">₹</span>
+
+                    <input
+                        type="number"
+                        name="amount"
+                        id="amount"
+                        value="<%= exp.amount %>"
+                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                        required>
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="category">Category</label>
+
+                <select name="category" id="category" required></select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="date">Date</label>
+
+                <input
+                    type="date"
+                    name="date"
+                    id="date"
+                    value="<%= new Date(exp.date).toISOString().split('T')[0] %>"
+                    required>
+
+            </div>
+
+
+            <button type="submit" class="save-btn" data-busy="Saving…">
+                Update Transaction
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const incomeCategories = [
+    "Salary",
+    "Freelancing",
+    "Business",
+    "Investment",
+    "Bonus",
+    "Gift Received",
+    "Rental Income",
+    "Refund",
+    "Cashback",
+    "Other Income"
+];
+
+const expenseCategories = [
+    "Food",
+    "Groceries",
+    "Rent",
+    "Electricity",
+    "Water Bill",
+    "Gas Bill",
+    "Internet",
+    "Mobile Recharge",
+    "Transportation",
+    "Fuel",
+    "Shopping",
+    "Clothing",
+    "Healthcare",
+    "Medicine",
+    "Education",
+    "Entertainment",
+    "Travel",
+    "Subscription",
+    "EMI / Loan",
+    "Personal Care",
+    "Pets",
+    "Charity",
+    "Family",
+    "Maintenance",
+    "Gifts",
+    "Other Expense"
+];
+
+const emojiMap = {
+    Salary: "💼",
+    Freelancing: "💻",
+    Business: "🏢",
+    Investment: "📈",
+    Bonus: "💰",
+    "Gift Received": "🎁",
+    "Rental Income": "🏠",
+    Refund: "💸",
+    Cashback: "💳",
+    "Other Income": "💵",
+
+    Food: "🍔",
+    Groceries: "🛒",
+    Rent: "🏠",
+    Electricity: "⚡",
+    "Water Bill": "💧",
+    "Gas Bill": "🔥",
+    Internet: "📶",
+    "Mobile Recharge": "📱",
+    Transportation: "🚕",
+    Fuel: "⛽",
+    Shopping: "🛍️",
+    Clothing: "👕",
+    Healthcare: "🏥",
+    Medicine: "💊",
+    Education: "🎓",
+    Entertainment: "🎬",
+    Travel: "✈️",
+    Subscription: "📺",
+    "EMI / Loan": "💳",
+    "Personal Care": "🧴",
+    Pets: "🐶",
+    Charity: "❤️",
+    Family: "👨‍👩‍👧",
+    Maintenance: "🔧",
+    Gifts: "🎁",
+    "Other Expense": "📦"
+};
+
+const typeSelect = document.getElementById("type");
+const categorySelect = document.getElementById("category");
+const segButtons = document.querySelectorAll(".seg-btn");
+
+const existingCategory = <%- JSON.stringify(exp.category || "") %>;
+
+function loadCategories() {
+
+    categorySelect.innerHTML = "";
+
+    const list = typeSelect.value === "income"
+        ? incomeCategories
+        : expenseCategories;
+
+    list.forEach(item => {
+
+        const option = document.createElement("option");
+
+        option.value = item;
+        option.textContent = `${emojiMap[item] || "•"} ${item}`;
+
+        if (item.toLowerCase() === existingCategory.toLowerCase()) {
+            option.selected = true;
+        }
+
+        categorySelect.appendChild(option);
+
+    });
+
+}
+
+function syncSegmented() {
+
+    segButtons.forEach(button => {
+
+        button.classList.toggle(
+            "is-active",
+            button.dataset.value === typeSelect.value
+        );
+
+    });
+
+}
+
+segButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        typeSelect.value = button.dataset.value;
+
+        syncSegmented();
+        loadCategories();
+
+    });
+
+});
+
+typeSelect.addEventListener("change", () => {
+
+    syncSegmented();
+    loadCategories();
+
+});
+
+loadCategories();
+syncSegmented();
+
+
+/* Prevent future dates */
+
+const dateInput = document.getElementById("date");
+
+dateInput.max = new Date().toISOString().split("T")[0];
+
+</script>

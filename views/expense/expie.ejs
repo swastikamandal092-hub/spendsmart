@@ -1,12 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    pie char for expense
-    
-</body>
-</html>
+<% layout("/layout/boilerplate") %>
+
+<div class="page-head">
+
+    <div>
+
+        <span class="eyebrow">
+            <i class="fa-solid fa-chart-pie"></i>
+            Graphs
+        </span>
+
+        <h1>Expense by Category</h1>
+
+        <p class="page-sub">
+            See which categories eat the biggest slice of your budget.
+        </p>
+
+    </div>
+
+</div>
+
+
+<section class="chart-card">
+
+    <div class="empty-state">
+
+        <span class="empty-emoji">🥧</span>
+
+        <h4>Open the live doughnut chart</h4>
+
+        <p>
+            Your category split is built from real transactions on the
+            Expense Breakdown page.
+        </p>
+
+        <a href="/transaction/expense/piechart" class="btn-cta solid" style="margin-top:16px;">
+            <i class="fa-solid fa-chart-pie"></i>
+            Open chart
+        </a>
+
+    </div>
+
+</section>

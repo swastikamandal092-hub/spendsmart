@@ -1,123 +1,351 @@
 <% layout("/layout/boilerplate") %>
-<body>
-    <div class="welcome-section">
 
-    <h2>Hi <%= user.name || user.username %> 👋</h2>
+<%
+const money = (n) => new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 2
+}).format(Number(n) || 0);
 
-    <p>Manage your money smarter today</p>
+const fmtDate = (d) => new Date(d).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+});
 
-</div>
+const savingsRate = totalIncome > 0
+    ? Math.max(0, Math.min(100, (currentBalance / totalIncome) * 100))
+    : 0;
 
-    <h4 class="section-title">
-    Current Balance
-</h4>
+const hour = new Date().getHours();
 
-    <div class="dashboard-summary">
+const greeting = hour < 12
+    ? "Good morning"
+    : hour < 17
+        ? "Good afternoon"
+        : "Good evening";
 
-    <div class="summary-card balance">
-        <p>Balance</p>
-        <h2>₹ <%= currentBalance %></h2>
+const displayName = (user.name || user.username || "there").split(" ")[0];
+
+const initial = displayName.trim().charAt(0).toUpperCase() || "S";
+%>
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="hero-card" data-reveal="0">
+
+    <div class="hero-main">
+
+        <h1>
+            <span class="hero-avatar">
+                <% if (user.profileImage) { %>
+                    <img src="/uploads/<%= user.profileImage %>" alt="">
+                <% } else { %>
+                    <%= initial %>
+                <% } %>
+            </span>
+
+            <%= greeting %>, <%= displayName %>
+            <span class="wave">👋</span>
+        </h1>
+
+        <p>Here's how your money is doing today.</p>
+
     </div>
 
-    <a href="/transaction/income/analytics" class="summary-card income">
+    <div class="hero-actions">
+
+        <a href="/transaction/new" class="btn-cta">
+            <i class="fa-solid fa-plus"></i>
+            Add transaction
+        </a>
+
+        <a href="/transactions" class="btn-cta ghost">
+            <i class="fa-solid fa-list"></i>
+            History
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SUMMARY
+===================================================== -->
+
+<div class="dashboard-summary">
+
+    <div class="summary-card balance-card-summary" data-reveal="40">
+
+        <span class="stat-icon">
+            <i class="fa-solid fa-wallet"></i>
+        </span>
+
+        <p>Available Balance</p>
+
+        <h2
+            class="stat-value"
+            data-count="<%= currentBalance %>">₹ <%= money(currentBalance) %></h2>
+
+        <span class="stat-hint <%= savingsRate > 0 ? "positive" : "neutral" %>">
+            <i class="fa-solid fa-piggy-bank"></i>
+            <%= savingsRate.toFixed(0) %>% of income saved
+        </span>
+
+    </div>
+
+
+    <a href="/transaction/income/analytics"
+       class="summary-card income-card-summary"
+       data-reveal="90">
+
+        <span class="stat-icon">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+        </span>
+
         <p>Total Income</p>
-        <h2>₹ <%= totalIncome %></h2>
+
+        <h2
+            class="stat-value"
+            data-count="<%= totalIncome %>">₹ <%= money(totalIncome) %></h2>
+
+        <span class="stat-hint positive">
+            <i class="fa-solid fa-chart-line"></i>
+            View income analytics
+        </span>
+
     </a>
 
-    <a href="/transaction/expense/analytics" class="summary-card expense">
+
+    <a href="/transaction/expense/analytics"
+       class="summary-card expense-card-summary"
+       data-reveal="140">
+
+        <span class="stat-icon">
+            <i class="fa-solid fa-arrow-trend-down"></i>
+        </span>
+
         <p>Total Expense</p>
-        <h2>₹ <%= totalExpense %></h2>
+
+        <h2
+            class="stat-value"
+            data-count="<%= totalExpense %>">₹ <%= money(totalExpense) %></h2>
+
+        <span class="stat-hint negative">
+            <i class="fa-solid fa-chart-column"></i>
+            View expense analytics
+        </span>
+
     </a>
-
-
 
 </div>
 
 
-<div class="trend-card">
+<!-- =====================================================
+     SAVINGS PROGRESS
+===================================================== -->
 
-    <h3>Income vs Expense Trend</h3>
+<div class="savings-strip" data-reveal="180">
 
-    <p class="text-muted mb-3">
-    Showing data for:
-    <strong><%= currentMonth %>, <%= currentYear %></strong>
-</p>
+    <div class="savings-strip-head">
 
-    <canvas id="dashboardTrend"></canvas>
+        <span>Savings progress this lifetime</span>
 
-<!-- Dashboard Quick Actions -->
+        <strong><%= savingsRate.toFixed(0) %>%</strong>
+
+    </div>
+
+    <div
+        class="progress-track"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="<%= savingsRate.toFixed(0) %>"
+        aria-label="Share of income saved">
+
+        <div
+            class="progress-fill"
+            style="--w: <%= savingsRate.toFixed(1) %>%;">
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     QUICK ACTIONS
+===================================================== -->
+
 <div class="quick-actions">
 
-    <!-- Add Transaction -->
-    <a href="/transaction/new" class="quick-card">
-        <i class="fa-solid fa-plus"></i>
-        <span>Add Transaction</span>
+    <a href="/transaction/new?type=income" class="quick-card quick-income">
+        <i class="fa-solid fa-arrow-down"></i>
+        <span>Add Income</span>
+        <small>Money coming in</small>
     </a>
 
-    <!-- All Transactions -->
-    <a href="/transactions" class="quick-card">
-        <i class="fa-solid fa-list"></i>
-        <span>Transactions</span>
+    <a href="/transaction/new?type=expense" class="quick-card quick-expense">
+        <i class="fa-solid fa-arrow-up"></i>
+        <span>Add Expense</span>
+        <small>Money going out</small>
     </a>
 
-    <!-- Income Analytics -->
-    <a href="/transaction/income/analytics" class="quick-card">
-        <i class="fa-solid fa-chart-line"></i>
-        <span>Income Analytics</span>
+    <a href="/transaction/income/analytics" class="quick-card quick-add">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Analytics</span>
+        <small>See your patterns</small>
     </a>
 
-    <!-- Expense Analytics -->
-    <a href="/transaction/expense/analytics" class="quick-card">
-        <i class="fa-solid fa-chart-column"></i>
-        <span>Expense Analytics</span>
+    <a href="/transactions" class="quick-card quick-list">
+        <i class="fa-solid fa-receipt"></i>
+        <span>All Transactions</span>
+        <small>Full history</small>
     </a>
 
 </div>
 
+
+<!-- =====================================================
+     TREND CHART
+===================================================== -->
+
+<section class="trend-card" data-reveal="80">
+
+    <div class="card-head">
+
+        <div>
+
+            <h3>Income vs Expense</h3>
+
+            <p class="card-sub">
+                Weekly split for
+                <strong><%= currentMonth %>, <%= currentYear %></strong>
+            </p>
+
+        </div>
+
+        <span class="chip chip-brand">
+            <i class="fa-solid fa-chart-simple"></i>
+            This month
+        </span>
+
+    </div>
+
+    <div class="chart-shell">
+        <canvas id="dashboardTrend"></canvas>
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     RECENT TRANSACTIONS
+===================================================== -->
+
 <h3 class="recent-heading">
+
     Recent Transactions
+
+    <a href="/transactions">
+        View all <i class="fa-solid fa-arrow-right"></i>
+    </a>
+
 </h3>
 
 
-    <% for(let e of recentTransactions){ %>
-        <div class="expenses">
+<% if (recentTransactions.length === 0) { %>
 
-    <div class="expense-header">
-        <div>
-            <h4><%= e.title %></h4>
-            <p class="category">
-                <%= e.category %> • <%= e.type %>
-            </p>
-        </div>
+    <div class="empty-state">
 
-        <div class="amount <%= e.type %>">
-            ₹<%= e.amount %>
-        </div>
+        <span class="empty-emoji">🪄</span>
+
+        <h4>Nothing here yet</h4>
+
+        <p>
+            Add your first transaction and this space will fill up
+            with your latest activity.
+        </p>
+
+        <a href="/transaction/new" class="btn-cta solid" style="margin-top:16px;">
+            <i class="fa-solid fa-plus"></i>
+            Add a transaction
+        </a>
+
     </div>
 
-    <div class="expense-footer">
-        <span>
-            <%= e.date.toString().split(" ").slice(0,4).join(" ") %>
-        </span>
+<% } else { %>
 
-        <div class="action-buttons">
+    <% for (let e of recentTransactions) { %>
 
-            <form method="get" action="/transaction/<%= e._id %>/edit">
-                <button class="btn btn-primary">Edit</button>
-            </form>
+        <article
+            class="expenses"
+            data-txn
+            data-type="<%= e.type %>"
+            data-category="<%= e.category %>"
+            data-reveal>
 
-            <form method="post" action="/transaction/<%= e._id %>?_method=DELETE">
-                <button class="btn btn-danger">Delete</button>
-            </form>
+            <div class="txn-row">
 
-        </div>
-    </div>
+                <div class="txn-icon">
+                    <span class="txn-emoji">🧾</span>
+                </div>
 
-</div>
-        
+                <div class="txn-body">
+
+                    <h4><%= e.title %></h4>
+
+                    <p class="category">
+                        <%= e.category %> • <%= e.type %>
+                    </p>
+
+                </div>
+
+                <div class="amount <%= e.type %>">
+                    <%= e.type === "income" ? "+" : "−" %>₹<%= money(e.amount) %>
+                </div>
+
+            </div>
+
+            <div class="expense-footer">
+
+                <span class="txn-date">
+                    <i class="fa-regular fa-calendar"></i>
+                    <%= fmtDate(e.date) %>
+                </span>
+
+                <div class="action-buttons">
+
+                    <form method="get" action="/transaction/<%= e._id %>/edit">
+                        <button type="submit" class="btn btn-primary">
+                            Edit
+                        </button>
+                    </form>
+
+                    <form
+                        method="post"
+                        action="/transaction/<%= e._id %>?_method=DELETE"
+                        data-success="deleted">
+
+                        <button type="submit" class="btn btn-danger">
+                            Delete
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </article>
+
     <% } %>
 
-    <!-- View All Transactions -->
+<% } %>
+
+
 <a href="/transactions" class="view-all-transactions-card">
 
     <div class="view-all-icon">
@@ -134,151 +362,150 @@
     </div>
 
 </a>
-    
-   
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 
-const chartLabels =
-<%- JSON.stringify(chartLabels) %>;
+(function () {
 
-const incomeValues =
-<%- JSON.stringify(incomeValues) %>;
+    const chartLabels = <%- JSON.stringify(chartLabels) %>;
+    const incomeValues = <%- JSON.stringify(incomeValues) %>;
+    const expenseValues = <%- JSON.stringify(expenseValues) %>;
 
-const expenseValues =
-<%- JSON.stringify(expenseValues) %>;
+    const canvas = document.getElementById("dashboardTrend");
 
-const ctx =
-document.getElementById("dashboardTrend")
-.getContext("2d");
+    if (!canvas || typeof Chart === "undefined") {
+        return;
+    }
 
-const incomeGradient =
-ctx.createLinearGradient(
-0,
-0,
-0,
-400
-);
+    const ctx = canvas.getContext("2d");
 
-incomeGradient.addColorStop(
-0,
-"#22c55e"
-);
+    const incomeGradient = ctx.createLinearGradient(0, 0, 0, 320);
+    incomeGradient.addColorStop(0, "#34d399");
+    incomeGradient.addColorStop(1, "#16a34a");
 
-incomeGradient.addColorStop(
-0.5,
-"#16a34a"
-);
+    const expenseGradient = ctx.createLinearGradient(0, 0, 0, 320);
+    expenseGradient.addColorStop(0, "#fb7185");
+    expenseGradient.addColorStop(1, "#e11d48");
 
-incomeGradient.addColorStop(
-1,
-"#15803d"
-);
+    const font = "'Plus Jakarta Sans', system-ui, sans-serif";
 
-const expenseGradient =
-ctx.createLinearGradient(
-0,
-0,
-0,
-400
-);
+    const formatMoney = (value) =>
+        "₹" + new Intl.NumberFormat("en-IN", {
+            maximumFractionDigits: 0
+        }).format(value);
 
-expenseGradient.addColorStop(
-0,
-"#ef4444"
-);
+    new Chart(ctx, {
 
-expenseGradient.addColorStop(
-0.5,
-"#dc2626"
-);
+        type: "bar",
 
-expenseGradient.addColorStop(
-1,
-"#991b1b"
-);
-new Chart(ctx,{
+        data: {
 
-    type:"bar",
+            labels: chartLabels,
 
-    data:{
+            datasets: [
+                {
+                    label: "Income",
+                    data: incomeValues,
+                    backgroundColor: incomeGradient,
+                    hoverBackgroundColor: "#059669",
+                    borderRadius: 9,
+                    borderSkipped: false,
+                    maxBarThickness: 26
+                },
+                {
+                    label: "Expense",
+                    data: expenseValues,
+                    backgroundColor: expenseGradient,
+                    hoverBackgroundColor: "#be123c",
+                    borderRadius: 9,
+                    borderSkipped: false,
+                    maxBarThickness: 26
+                }
+            ]
 
-        labels:chartLabels,
-
-        datasets:[
-
-        {
-
-    label:"Income",
-
-    data:incomeValues,
-
-    backgroundColor:
-    incomeGradient,
-
-    borderRadius:{
-        topLeft:18,
-        topRight:18,
-        bottomLeft:0,
-        bottomRight:0
-    },
-
-    borderSkipped:"bottom",
-
-    barThickness:22
-
-},
-
-        {
-
-            label:"Expense",
-
-    data:expenseValues,
-
-    backgroundColor:
-    expenseGradient,
-
-    borderRadius:{
-        topLeft:18,
-        topRight:18,
-        bottomLeft:0,
-        bottomRight:0
-    },
-
-    borderSkipped:"bottom",
-
-    barThickness:22
-
-        }
-
-        ]
-    },
-
-    options:{
-
-        responsive:true,
-
-        plugins:{
-
-            legend:{
-                position:"top"
-            }
         },
 
-        scales:{
+        options: {
 
-            x:{
-                grid:{
-                    display:false
-                }
+            responsive: true,
+            maintainAspectRatio: false,
+
+            interaction: {
+                mode: "index",
+                intersect: false
             },
 
-            y:{
-                beginAtZero:true
+            animation: {
+                duration: 900,
+                easing: "easeOutQuart"
+            },
+
+            plugins: {
+
+                legend: {
+                    position: "top",
+                    align: "end",
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: "circle",
+                        boxWidth: 8,
+                        boxHeight: 8,
+                        padding: 16,
+                        color: "#475569",
+                        font: { family: font, size: 12, weight: "600" }
+                    }
+                },
+
+                tooltip: {
+                    backgroundColor: "#0f172a",
+                    padding: 12,
+                    cornerRadius: 10,
+                    displayColors: false,
+                    titleFont: { family: font, size: 12, weight: "700" },
+                    bodyFont: { family: font, size: 12, weight: "600" },
+                    callbacks: {
+                        label: (item) =>
+                            " " + item.dataset.label + ": " + formatMoney(item.parsed.y)
+                    }
+                }
+
+            },
+
+            scales: {
+
+                x: {
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: {
+                        color: "#94a3b8",
+                        font: { family: font, size: 11, weight: "600" }
+                    }
+                },
+
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: "#eef0f8",
+                        drawTicks: false
+                    },
+                    border: { display: false },
+                    ticks: {
+                        color: "#94a3b8",
+                        maxTicksLimit: 5,
+                        font: { family: font, size: 11, weight: "600" },
+                        callback: (value) => formatMoney(value)
+                    }
+                }
+
             }
+
         }
-    }
-});
+
+    });
+
+}());
+
 </script>
-</body>
-</html>

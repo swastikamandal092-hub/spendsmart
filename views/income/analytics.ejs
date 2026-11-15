@@ -1,401 +1,343 @@
 <% layout("/layout/boilerplate") %>
 
-<% layout("/layout/boilerplate") %>
-
 <%
 const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
 ];
+
+const money = (n) => new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 2
+}).format(Number(n) || 0);
+
+const total = values.reduce((sum, value) => sum + value, 0);
+
+const peakIndex = values.length ? values.indexOf(Math.max.apply(null, values)) : 0;
+
+const peakLabel = labels[peakIndex]
+    ? (Array.isArray(labels[peakIndex]) ? labels[peakIndex].join(" ") : labels[peakIndex])
+    : "—";
+
+const peakValue = values[peakIndex] || 0;
+
+const average = values.length ? total / values.length : 0;
+
+const currentYear = new Date().getFullYear();
 %>
 
-<div class="container py-4">
+<div class="page-head">
 
-<div class="container py-4">
+    <div>
 
-    <!-- Header -->
+        <span class="eyebrow">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+            Analytics
+        </span>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Income Analytics</h1>
 
-        <h2 class="fw-bold text-success mb-0">
-            Income Analytics
-        </h2>
-
-        <select
-    id="chartSelector"
-    class="form-select shadow-sm"
-    style="width:150px;">
-
-    <option
-        value="bar"
-        <%= currentChart==="bar" ? "selected" : "" %>>
-
-        📊 Bar Graph
-
-    </option>
-
-    <option
-        value="pie"
-        <%= currentChart==="pie" ? "selected" : "" %>>
-
-        🥧 Pie Chart
-
-    </option>
-
-</select>
+        <p class="page-sub">
+            See when your money arrives and which periods perform best.
+        </p>
 
     </div>
 
+    <a href="/transaction/new" class="btn-cta solid">
+        <i class="fa-solid fa-plus"></i>
+        Add income
+    </a>
 
-    <!-- Filters -->
+</div>
 
-    <div class="row g-2 mb-4">
 
-        <div class="col-md-4">
+<div class="chip-row" style="margin-bottom:18px;">
 
-           <div class="dropdown">
+    <a href="/transaction/income/analytics" class="filter-chip is-active">
+        <i class="fa-solid fa-chart-column"></i>
+        Bar graph
+    </a>
 
-    <button
-        class="btn btn-outline-success dropdown-toggle"
-        id="weekBtn"
-        data-bs-toggle="dropdown">
+    <a href="/transaction/income/piechart" class="filter-chip">
+        <i class="fa-solid fa-chart-pie"></i>
+        Doughnut
+    </a>
 
-        Week <%= selectedWeek %>
+</div>
 
-    </button>
 
-    <ul class="dropdown-menu custom-dropdown">
+<form
+    class="analytics-toolbar"
+    method="GET"
+    action="/transaction/income/analytics"
+    id="filterForm">
 
-        <% for(let i=1;i<=5;i++){ %>
+    <label class="pill-select" for="filterRange">
+        <i class="fa-solid fa-sliders"></i>
 
-            <li>
+        <select name="filter" id="filterRange">
 
-                <a
-                    href="#"
-                    class="dropdown-item week-item"
-                    data-week="<%= i %>">
+            <option value="month" <%= filter === "month" ? "selected" : "" %>>
+                By month
+            </option>
 
+            <option value="week" <%= filter === "week" ? "selected" : "" %>>
+                By week
+            </option>
+
+            <option value="year" <%= filter === "year" ? "selected" : "" %>>
+                By year
+            </option>
+
+        </select>
+    </label>
+
+
+    <label class="pill-select" for="weekSelect">
+        <i class="fa-solid fa-calendar-week"></i>
+
+        <select name="week" id="weekSelect">
+
+            <% for (let i = 1; i <= 5; i++) { %>
+
+                <option value="<%= i %>" <%= selectedWeek === i ? "selected" : "" %>>
                     Week <%= i %>
+                </option>
 
-                </a>
+            <% } %>
 
-            </li>
+        </select>
+    </label>
 
-        <% } %>
 
-    </ul>
+    <label class="pill-select" for="monthSelect">
+        <i class="fa-regular fa-calendar"></i>
 
-</div> 
+        <select name="month" id="monthSelect">
 
-        </div>
+            <% months.forEach((month, index) => { %>
 
-        <div class="col-md-4">
-
-            <div class="dropdown">
-
-    <button
-        class="btn btn-outline-primary dropdown-toggle"
-        id="monthBtn"
-        data-bs-toggle="dropdown">
-
-        <%= months[selectedMonth-1] %>
-
-    </button>
-
-    <ul class="dropdown-menu custom-dropdown">
-
-        <% months.forEach((month,index)=>{ %>
-
-            <li>
-
-                <a
-                    href="#"
-                    class="dropdown-item month-item"
-                    data-month="<%= index+1 %>">
+                <option
+                    value="<%= index + 1 %>"
+                    <%= selectedMonth === index + 1 ? "selected" : "" %>>
 
                     <%= month %>
 
-                </a>
+                </option>
 
-            </li>
+            <% }) %>
 
-        <% }) %>
+        </select>
+    </label>
 
-    </ul>
 
-</div>
+    <label class="pill-select" for="yearSelect">
+        <i class="fa-regular fa-calendar-days"></i>
 
-        </div>
+        <select name="year" id="yearSelect">
 
-        <div class="col-md-4">
+            <% for (let y = currentYear; y >= 2000; y--) { %>
 
-            <div class="dropdown">
+                <option value="<%= y %>" <%= selectedYear === y ? "selected" : "" %>>
+                    <%= y %>
+                </option>
 
-    <button
-        class="btn btn-outline-dark dropdown-toggle"
-        id="yearBtn"
-        data-bs-toggle="dropdown">
+            <% } %>
 
-        <%= selectedYear %>
+        </select>
+    </label>
 
+
+    <button type="submit" class="btn-cta solid" style="flex:0 0 auto;">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        Apply
     </button>
 
-    <ul class="dropdown-menu custom-dropdown">
+</form>
 
-        <%
-        const currentYear = new Date().getFullYear();
-        %>
 
-        <% for(let y=currentYear; y>=2000; y--){ %>
+<div class="chart-summary">
 
-            <li>
+    <div class="mini-stat">
+        <span>Total</span>
+        <strong>₹ <%= money(total) %></strong>
+    </div>
 
-                <a
-                    class="dropdown-item year-item"
-                    href="#"
-                    data-year="<%= y %>">
+    <div class="mini-stat">
+        <span>Best period</span>
+        <strong><%= peakLabel %></strong>
+    </div>
 
-                    <%= y %>
+    <div class="mini-stat">
+        <span>Average</span>
+        <strong>₹ <%= money(average) %></strong>
+    </div>
 
-                </a>
+</div>
 
-            </li>
 
+<section class="chart-card" data-reveal="60">
+
+    <div class="card-head">
+
+        <div>
+
+            <h3>Income overview</h3>
+
+            <p class="card-sub">
+                ₹ <%= money(peakValue) %> earned in the strongest period
+            </p>
+
+        </div>
+
+        <span class="chip chip-brand">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+            INR
+        </span>
+
+    </div>
+
+    <div class="chart-shell">
+        <canvas id="incomeChart"></canvas>
+    </div>
+
+    <p class="graph-period" id="showingPeriod">
+        Showing data for:
+        <% if (filter === "year") { %>
+            <%= selectedYear %>
+        <% } else if (filter === "week") { %>
+            Week <%= selectedWeek %> • <%= months[selectedMonth - 1] %> <%= selectedYear %>
+        <% } else { %>
+            <%= months[selectedMonth - 1] %> <%= selectedYear %>
         <% } %>
+    </p>
 
-    </ul>
+    <% if (total === 0) { %>
 
-</div>
+        <div class="empty-state" style="margin-top:18px;">
 
-        </div>
+            <span class="empty-emoji">🌤️</span>
 
-    </div>
+            <h4>No income in this period</h4>
 
-
-   <!-- Graph -->
-
-<div class="card shadow border-0 rounded-4">
-
-    <div class="card-body p-4">
-
-        <canvas
-            id="incomeChart"
-            height="110">
-        </canvas>
-
-        <div class="text-center mt-4">
-
-            <small
-                id="showingPeriod"
-                class="text-secondary fw-semibold">
-
-                Showing data for :
-                Week <%= selectedWeek %> •
-                <%= months[selectedMonth-1] %>
-                <%= selectedYear %>
-
-            </small>
+            <p>Try another month, week or year to see your income graph.</p>
 
         </div>
 
-    </div>
+    <% } %>
 
-</div>
+</section>
 
-   
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-     
-    const showingPeriod =
-document.getElementById("showingPeriod");
 
+(function () {
 
-const selectedWeek = <%= selectedWeek %>;
-const selectedMonth = <%= selectedMonth %>;
-const selectedYear = <%= selectedYear %>;
+    const labels = <%- JSON.stringify(labels) %>;
+    const values = <%- JSON.stringify(values) %>;
 
-function updateShowing(){
+    const canvas = document.getElementById("incomeChart");
 
-    showingPeriod.innerHTML =
-    `Showing data for : ${selectedWeek} • ${selectedMonth} ${selectedYear}`;
+    if (!canvas || typeof Chart === "undefined") {
+        return;
+    }
 
-}
+    const ctx = canvas.getContext("2d");
 
-    const monthBtn = document.getElementById("monthBtn");
-    const weekBtn = document.getElementById("weekBtn");
-    const yearBtn = document.getElementById("yearBtn");
+    const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+    gradient.addColorStop(0, "#34d399");
+    gradient.addColorStop(1, "#16a34a");
 
-document.querySelectorAll(".month-item").forEach(item => {
+    const font = "'Plus Jakarta Sans', system-ui, sans-serif";
 
-    item.addEventListener("click", function(e){
+    const formatMoney = (value) =>
+        "₹" + new Intl.NumberFormat("en-IN", {
+            maximumFractionDigits: 0
+        }).format(value);
 
-        e.preventDefault();
+    new Chart(ctx, {
 
-        const monthNumber =
-        this.dataset.month;
+        type: "bar",
 
-        window.location.href =
-        `/transaction/income/analytics?filter=month&year=${selectedYear}&month=${monthNumber}`;
+        data: {
 
-    });
+            labels: labels,
 
-});
+            datasets: [{
+                label: "Income",
+                data: values,
+                backgroundColor: gradient,
+                hoverBackgroundColor: "#059669",
+                borderRadius: 9,
+                borderSkipped: false,
+                maxBarThickness: 34
+            }]
 
+        },
 
-document.querySelectorAll(".week-item").forEach(item => {
+        options: {
 
-    item.addEventListener("click", function(e){
+            responsive: true,
+            maintainAspectRatio: false,
 
-        e.preventDefault();
-
-        const week =
-        this.dataset.week;
-
-        window.location.href =
-        `/transaction/income/analytics?filter=week&year=${selectedYear}&month=${selectedMonth}&week=${week}`;
-
-    });
-
-});
-
-document.querySelectorAll(".year-item").forEach(item => {
-
-    item.addEventListener("click", function(e){
-
-        e.preventDefault();
-
-        const year =
-        this.dataset.year;
-
-        window.location.href =
-        `/transaction/income/analytics?filter=year&year=${year}&month=${selectedMonth}`;
-
-    });
-
-});
-
-const labels = <%- JSON.stringify(labels) %>;
-const values = <%- JSON.stringify(values) %>;
-
-const ctx =
-document.getElementById("incomeChart")
-.getContext("2d");
-
-const gradient =
-ctx.createLinearGradient(0,0,0,400);
-
-gradient.addColorStop(0,"#B8F2E6");
-gradient.addColorStop(0.5,"#A5F3FC");
-gradient.addColorStop(1,"#DDD6FE");
-
-new Chart(ctx,{
-
-    type:"bar",
-
-    data:{
-
-        labels:labels,
-
-        datasets:[{
-
-            label:"Income",
-
-            data:values,
-
-            backgroundColor:gradient,
-
-            borderRadius:{
-                topLeft:14,
-                topRight:14,
-                bottomLeft:0,
-                bottomRight:0
+            animation: {
+                duration: 900,
+                easing: "easeOutQuart"
             },
 
-            borderSkipped:"bottom",
+            plugins: {
 
-            barThickness:24,
+                legend: { display: false },
 
-            hoverBackgroundColor:"#8EC5FC"
-
-        }]
-
-    },
-
-    options:{
-
-        responsive:true,
-
-        animation:{
-            duration:1000
-        },
-
-        plugins:{
-
-            legend:{
-                display:false
-            }
-
-        },
-
-        scales:{
-
-            x:{
-
-                ticks:{
-                    font:{
-                        size:13
+                tooltip: {
+                    backgroundColor: "#0f172a",
+                    padding: 12,
+                    cornerRadius: 10,
+                    displayColors: false,
+                    titleFont: { family: font, size: 12, weight: "700" },
+                    bodyFont: { family: font, size: 12, weight: "600" },
+                    callbacks: {
+                        label: (item) => " Income: " + formatMoney(item.parsed.y)
                     }
-                },
-
-                grid:{
-                    display:false
                 }
 
             },
 
-            y:{
+            scales: {
 
-                beginAtZero:true,
+                x: {
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: {
+                        color: "#94a3b8",
+                        autoSkip: true,
+                        maxRotation: 0,
+                        font: { family: font, size: 11, weight: "600" }
+                    }
+                },
 
-                grid:{
-                    color:"#ECECEC"
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: "#eef0f8",
+                        drawTicks: false
+                    },
+                    border: { display: false },
+                    ticks: {
+                        color: "#94a3b8",
+                        maxTicksLimit: 5,
+                        font: { family: font, size: 11, weight: "600" },
+                        callback: (value) => formatMoney(value)
+                    }
                 }
 
             }
 
         }
 
-    }
+    });
 
-});
-
-const chartSelector = document.getElementById("chartSelector");
-
-chartSelector.addEventListener("change", function () {
-
-    if (this.value === "pie") {
-
-        window.location.href = "/transaction/income/piechart";
-
-    } else {
-
-        window.location.href = "/transaction/income/analytics";
-
-    }
-
-});
+}());
 
 </script>
