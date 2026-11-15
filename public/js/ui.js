@@ -253,7 +253,11 @@
             list.forEach(show);
         }
 
-        if (reduceMotion || !("IntersectionObserver" in window)) {
+        if (
+            reduceMotion ||
+            document.hidden ||
+            !("IntersectionObserver" in window)
+        ) {
             showAll();
             return;
         }
